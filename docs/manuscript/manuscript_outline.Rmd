@@ -20,7 +20,7 @@ Morgan M. Sparks, Brian Leavell, Bryan M. Maitland
 
 # Abstract
 
-Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscripts broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
+Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
 
 # Introduction
 
@@ -128,7 +128,11 @@ knitr::kable(df,
 )
 ```
 
-If you import data from raw files with multiple daily readings, the package allows you to summarize your with `summarize_temp()` and then check summarized data with the `plot_check_temp()` and `check_continuou()` functions.
+If you import data from raw files with multiple daily readings, the package allows you to summarize your with `summarize_temp()` and then check summarized data with the `plot_check_temp()` and `check_continuous()` functions.
+
+## Predicting phenology
+
+hatchR has two function to predict phenology. The first is `predict_phenology()` where users input date of reproductive event (`spawn.date`) along with their daily average temperature and corresponding dates. Alternatively, the function `predict_spawn()` leverages the effective value model framework but works backward from observed or expected development. For example, if a user observed one of the many frog or reptile parameterizations below in an area where they had accurate temperature measurements, they could easily estimate when those individuals adults mated.
 
 # Case studies
 
