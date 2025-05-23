@@ -132,7 +132,84 @@ If you import data from raw files with multiple daily readings, the package allo
 
 # Case studies
 
-There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide XXX examples in the table below of studies that could be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic spread that could be paired with the effective value approach.
+There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide XXX examples in the table below of studies that could be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic breadth that could be paired with the effective value approach.
+
+| Class | Order | Genera | Species | Study |
+|:----------------------|:------------|:------------|:------------|:-----------|
+| Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
+|  |  |  | *L. pipiens* |  |
+|  |  |  | *L. clamitans* |  |
+|  |  |  | *L. palustris* |  |
+|  |  | *Ascaphus* | *A. truei* | @brown1975 |
+|  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
+| Reptilia | Squamata | *Sceloporus* | *S. undulatus* |  @angilletta2000 |
+|  |  | Podarcis | *P. mural*is | @vandamme1992 |
+|  | Testudines | Mauremys | M. reevesii | @du2007 |
+|  |  |  | 181 species | 141 studies in @while2018 |
+| Insecta | Plecoptera | *Nemurella* | *N. pictetii* | @brittain1978, @elliott1984 |
+|  |  | *Capnia* | *C. atra* | @brittain1984 |
+|  |  | *Capnia* | *C. bifrons* | @elliott1986 |
+|  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
+|  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
+| Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
+
+@while2018 not vetted for completeness
+
+@pritchard1987 contains examples of power equations for 18 insect species
+
+```{r, eval=FALSE}
+
+# trying to find study with multiple good pops (failing)
+
+
+reptiles <- read_csv("../../data/reptile_database.csv")
+
+unique(reptiles$trait)
+
+#species count
+reptiles |> 
+  filter(trait == "Incubation duration") |> 
+group_by(first_author_surname, pub_year, genus, species) |> 
+  summarise(count = n()) 
+  
+
+#study count
+reptiles |> 
+  filter(trait == "Incubation duration") |> 
+group_by(first_author_surname, pub_year) |> 
+  summarise(count = n())
+
+#species count
+reptiles |> 
+  filter(trait == "Incubation duration") |> 
+group_by(first_author_surname, pub_year, genus, species, population) |> 
+  slice_head() |> 
+  group_by(genus, species, state_province) |>  
+  summarise(count = n()) |> 
+  arrange(desc(count))
+
+# nost common species
+
+reptiles |> 
+  filter(trait == "Incubation duration") |> 
+  filter( genus == "Caretta" & species == "caretta") |> 
+  group_by(first_author_surname, pub_year, population ) |> 
+  ggplot(aes(x = T, y = mean, color = first_author_surname, shape = population)) +
+  geom_point() +
+  geom_line() +
+  theme_classic()
+
+reptiles |> 
+  filter(trait == "Incubation duration") |> 
+  filter( genus == "Sceloporus" & species == "undulatus") |> 
+  group_by(first_author_surname, pub_year, population ) |> 
+  ggplot(aes(x = T, y = mean, color = first_author_surname, shape = population, group = population)) +
+  geom_point() +
+  geom_line() +
+  theme_classic()
+```
+
+examples where other stages could be modeled assuming constant feeding [@lillehammer1986]
 
 ## Ecological
 
@@ -230,7 +307,7 @@ froggy_hatch <- froggy_hatch |>
 
 
 
-ggplot() +
+p2.1 <- ggplot() +
   geom_point(data = temperature_data, aes(x = dates, y = temperatures)) +
   geom_line(data = temperature_data, aes(x = dates, y = temperatures)) +
   geom_rect(data = froggy_hatch, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
@@ -257,6 +334,8 @@ P2: Caveats
 -   namely that some taxa like insects and frogs are much more likely to bail on development when environmental cues suggest they need to
 
 P3: Other considerations?
+
+-   easy to parameterize custom models for quick developing species
 
 P4: ???
 
