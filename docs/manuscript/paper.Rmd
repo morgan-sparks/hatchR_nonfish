@@ -348,7 +348,7 @@ p2.1 <- ggplot() +
 ### Figure B code
 
 temps <- c(6:20)
-species = species = c("Wood Frog", "Pickerel Frog", 
+species = c("Wood Frog", "Pickerel Frog", 
                        "Green Frog","Northern Leopard Frog" )
 ef_vals <- NULL
 
