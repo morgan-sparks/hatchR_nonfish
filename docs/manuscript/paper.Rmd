@@ -14,18 +14,25 @@ bibliography: references.bib
 knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE,
                       message = FALSE)
-library(hatchR); library(tidyverse); library(patchwork)
+
+library(hatchR)
+library(tidyverse)
+library(patchwork)
 ```
 
 # A generalizable tool for predicting developmental phenology for wild poikilotherms.
 
-Morgan M. Sparks, Brian Leavell, Bryan M. Maitland
+Morgan M. Sparks^1^, Brian Leavell^2^, Bryan M. Maitland^1^
+
+^1^Rocky Mountain Research Station, U.S. Forest Service, Boise, Idaho
+
+^2^ Brian's deets here
+
 \newpage
 
 # Abstract
 
-Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
-\newpage
+Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions. \newpage
 
 # Introduction
 
@@ -53,7 +60,7 @@ Where *i* is the daily value and a fish hatches or emerges when the cumulative s
 
 As an example, we parameterize an effective value model for western tailed frogs (*Ascaphus truei*) common to western North America (Figure 1). Custom parameterized models use the `fit_model()` function in hatchR, which is built on model 2 using the power law from @beacham1990. Alternatively, to actually predict phenology using hatchR, the `predict_phenology()` only expects a model expression as input and could assume other model formulations custom built outside of the package by the user.
 
-```{r}
+```{r, fig.align = 'center', fig.cap="Custom hatching phenology model for western tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
 # https://www.sciencedirect.com/science/article/pii/030096297590033X
 
@@ -98,7 +105,7 @@ p2 <- ascaphus_ef |>
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   theme_classic()
 
-p1 + p2
+p1 + p2 + plot_annotation(tag_levels = 'A')
 ```
 
 ## Data and data checks
@@ -144,14 +151,14 @@ hatchR has two function to predict phenology. The first is `predict_phenology()`
 There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide XXX examples in the table below of studies that could be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic breadth that could be paired with the effective value approach.
 
 | Class | Order | Genera | Species | Study |
-|:----------------------|:------------|:------------|:------------|:-----------|
+|:--------------|:--------------|:--------------|:--------------|:--------------|
 | Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
 |  |  |  | *L. pipiens* |  |
 |  |  |  | *L. clamitans* |  |
 |  |  |  | *L. palustris* |  |
 |  |  | *Ascaphus* | *A. truei* | @brown1975 |
 |  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
-| Reptilia | Squamata | *Sceloporus* | *S. undulatus* |  @angilletta2000 |
+| Reptilia | Squamata | *Sceloporus* | *S. undulatus* | @angilletta2000 |
 |  |  | Podarcis | *P. mural*is | @vandamme1992 |
 |  | Testudines | Mauremys | M. reevesii | @du2007 |
 |  |  |  | 181 species | 141 studies in @while2018 |
@@ -161,6 +168,8 @@ There are numerous applications for effective value models and poikilotherms tha
 |  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
 |  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
 | Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
+
+: Sources for effective value parameterizations using `fit_model()` in hatchR. Represented are a broad range of taxa and some review studies which include numerous putative sources.
 
 @while2018 not vetted for completeness
 
@@ -226,7 +235,9 @@ Tailed frog and westlope cutthroat example???
 
 ## Phylogenetic
 
-```{r}
+Frog example Moore 1939.
+
+```{r, fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C."}
 
 ### all the Rana's below refer to taxonomy from the paper, they are now genus Lithobates
 
@@ -321,13 +332,12 @@ p2.1 <- ggplot() +
   geom_line(data = temperature_data, aes(x = dates, y = temperatures)) +
   geom_rect(data = froggy_hatch, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
   geom_label(data = froggy_hatch, aes(x = start + (stop - start) / 1.45, y = (index -0.325), label = days_to_develop)) +
-  labs(x = "Date", y = "Temperature (°C)",
-       title = "Development periods of four North American Frog Species") +
+  labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
   theme_classic() +
   theme(legend.position = c(0.75, 0.25))
 
-
+p2.1
 ```
 
 ## Local Adaptation
