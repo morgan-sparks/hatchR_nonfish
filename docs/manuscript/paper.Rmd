@@ -237,7 +237,9 @@ Tailed frog and westlope cutthroat example???
 
 Frog example Moore 1939.
 
-```{r, fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C."}
+Pic labels are wrong, check
+
+```{r, fig.height= 4.5 , fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C (Panel A). Panel B shows the effective values for different mean daily temperatures for each species, which are effectively species-specific linearized developmental reaction norms."}
 
 ### all the Rana's below refer to taxonomy from the paper, they are now genus Lithobates
 
@@ -298,6 +300,7 @@ rana_p_mod <- fit_model(temp = rana_p_data$temp,
 
 # Lithobates example --------------------------------------------------------------------
 
+### Figure A Code
 set.seed(123)
 temperature_data <- data.frame(temperatures = sort(rnorm(30, mean = 16, sd =2.5)),
                                dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days"))
@@ -313,16 +316,21 @@ froggy_hatch <- map(froggy_mods,
                     dates = dates,
                     temperature = temperatures,
                     spawn.date = "2000-04-01") |>
-  map_dbl("days_to_develop") |>
-  sort(decreasing = TRUE) |>
+  map_dbl("days_to_develop") |> 
   tibble()
+
+colnames(froggy_hatch)[1] <- "days_to_develop"
+  
+froggy_hatch <- froggy_hatch |> 
+    mutate(species = c("Wood Frog", "Pickerel Frog", 
+                       "Green Frog","Northern Leopard Frog" )) |> 
+  arrange(desc(days_to_develop)) 
 
 colnames(froggy_hatch)[1] <- "days_to_develop"
 
 froggy_hatch <- froggy_hatch |>
   mutate(start = ymd("2000-04-01"),
          stop = start + days_to_develop,
-         species = c("Green Frog", "Pickerel Frog", "Northern Leopard Frog", "Wood Frog"),
          index = seq(20.5,17.5, by = -1))
 
 
@@ -337,7 +345,40 @@ p2.1 <- ggplot() +
   theme_classic() +
   theme(legend.position = c(0.75, 0.25))
 
-p2.1
+### Figure B code
+
+temps <- c(6:20)
+species = species = c("Wood Frog", "Pickerel Frog", 
+                       "Green Frog","Northern Leopard Frog" )
+ef_vals <- NULL
+
+for( m in 1:length(froggy_mods)){
+  mod = froggy_mods[m]
+  frog = species[m]
+
+for (x in temps) {
+  ef <- eval(parse(text = mod))
+  temp_df <- data.frame(temperature = x, 
+                        effective_value = ef, 
+                        frog_species = frog)
+  ef_vals <- rbind(ef_vals, temp_df)
+  
+  }
+}
+
+data_2 <- tibble(temperature = c(0:20), effective_value = seq(0, 0.20, by = 0.01))
+
+p2.2 <- ef_vals |> tibble() |> 
+  ggplot(aes(x = temperature, y = effective_value, color = frog_species)) +
+  geom_line() +
+  geom_point() +
+  geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
+  labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
+  scale_color_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
+  theme_classic() +
+  theme(legend.position = "none")
+
+p2.1 + p2.2 + plot_annotation(tag_levels = 'A')
 ```
 
 ## Local Adaptation
