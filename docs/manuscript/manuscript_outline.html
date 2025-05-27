@@ -394,7 +394,7 @@ non-variable developmental regimes making them difficult to apply to
 wild environments. However, the R package hatchR formalized an approach
 using effective values where each day is given a developmental unit,
 accurately predicting developmental phenology for wild poikilotherms.
-hatchR was developed specific to fish, however this manuscripts broadens
+hatchR was developed specific to fish, however this manuscript broadens
 the tool’s application showing how it can be used to predict
 developmental phenology for a broad range of taxa, including amphibians,
 reptiles, and invertebrates. Moreover, we provide numerous examples of
@@ -481,8 +481,21 @@ daily recordings.</p>
 <p>If you import data from raw files with multiple daily readings, the
 package allows you to summarize your with <code>summarize_temp()</code>
 and then check summarized data with the <code>plot_check_temp()</code>
-and <code>check_continuou()</code> functions.</p>
+and <code>check_continuous()</code> functions.</p>
 </div>
+</div>
+<div id="predicting-phenology" class="section level2">
+<h2>Predicting phenology</h2>
+<p>hatchR has two function to predict phenology. The first is
+<code>predict_phenology()</code> where users input date of reproductive
+event (<code>spawn.date</code>) along with their daily average
+temperature and corresponding dates. Alternatively, the function
+<code>predict_spawn()</code> leverages the effective value model
+framework but works backward from observed or expected development. For
+example, if a user observed one of the many frog or reptile
+parameterizations below in an area where they had accurate temperature
+measurements, they could easily estimate when those individuals adults
+mated.</p>
 </div>
 </div>
 <div id="case-studies" class="section level1">

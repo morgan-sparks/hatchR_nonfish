@@ -1,7 +1,12 @@
 ---
-title: "manuscript_outline"
-output: html_document
-date: "2025-05-23"
+title: ""
+output: pdf_document
+header-includes:
+   - \usepackage{lineno}
+   - \linenumbers
+   - \usepackage{setspace}
+   - \doublespacing
+csl: apa.csl
 bibliography: references.bib
 ---
 
@@ -12,15 +17,15 @@ knitr::opts_chunk$set(echo = FALSE,
 library(hatchR); library(tidyverse); library(patchwork)
 ```
 
-# Title Page
-
-A generalizable tool for predicting developmental phenology for wild poikilotherms.
+# A generalizable tool for predicting developmental phenology for wild poikilotherms.
 
 Morgan M. Sparks, Brian Leavell, Bryan M. Maitland
+\newpage
 
 # Abstract
 
 Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
+\newpage
 
 # Introduction
 
