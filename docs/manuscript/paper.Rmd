@@ -22,7 +22,7 @@ library(patchwork)
 
 # A generalizable tool for predicting developmental phenology for wild poikilotherms.
 
-Morgan M. Sparks^1^, Brian Leavell^2^, Bryan M. Maitland^1^
+Morgan M. Sparks^1^, Brian Z. Leavell^2^, Bryan M. Maitland^1^
 
 ^1^Rocky Mountain Research Station, U.S. Forest Service, Boise, Idaho
 
@@ -32,7 +32,9 @@ Morgan M. Sparks^1^, Brian Leavell^2^, Bryan M. Maitland^1^
 
 # Abstract
 
-Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions. \newpage
+Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
+
+\newpage
 
 # Introduction
 
@@ -48,7 +50,7 @@ P4: Our approach here (R package and Shiny app)
 
 ## Effective value models
 
-Effective value models function by leveraging the statistical relationship derived from raising poikilotherms at different temperatures and fitting that relationsip with a non-linear model. The formultation of that relationship can then be reciprocated which provides the unit of development for a day's average temperature--an effective value. Effective value models function then by cumulatively summing to one at which the organism achieves the development of the parameterized trait.
+Effective value models function by leveraging the statistical relationship derived from raising poikilotherms at different temperatures and fitting that relationship with a non-linear model. The formulation of that relationship can then be reciprocated which provides the unit of development for a day's average temperature--an effective value. Effective value models function then by cumulatively summing to one at which the organism achieves the development of the parameterized trait.
 
 The model follows the general format of:
 
@@ -58,9 +60,9 @@ $$
 
 Where *i* is the daily value and a fish hatches or emerges when the cumulative sum reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
 
-As an example, we parameterize an effective value model for western tailed frogs (*Ascaphus truei*) common to western North America (Figure 1). Custom parameterized models use the `fit_model()` function in hatchR, which is built on model 2 using the power law from @beacham1990. Alternatively, to actually predict phenology using hatchR, the `predict_phenology()` only expects a model expression as input and could assume other model formulations custom built outside of the package by the user.
+As an example, we parameterize an effective value model for coastal tailed frogs (*Ascaphus truei*) common to western North America (Figure 1). Custom parameterized models use the `fit_model()` function in hatchR, which is built on model 2 using the power law from @beacham1990. Alternatively, to predict phenology using hatchR, the `predict_phenology()` only requires a model expression as input and could assume other model formulations custom built outside of the package by the user.
 
-```{r, fig.align = 'center', fig.cap="Custom hatching phenology model for western tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
+```{r, fig.align = 'center', fig.cap="Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
 # https://www.sciencedirect.com/science/article/pii/030096297590033X
 
@@ -119,18 +121,18 @@ Maybe include the below:
 ```{r}
 df <- data.frame(
   date = c(
-    "2000-01-01",
+    "2024-01-01",
     "...",
-    "2000-07-01",
+    "2024-07-01",
     "...",
-    "2000-12-31"
+    "2024-12-31"
   ),
   temperature = c(
-    2.51,
+   4.67,
     "...",
-    16.32,
+    22.31,
     "...",
-    3.13
+    2.58
   )
 )
 
@@ -144,11 +146,11 @@ If you import data from raw files with multiple daily readings, the package allo
 
 ## Predicting phenology
 
-hatchR has two function to predict phenology. The first is `predict_phenology()` where users input date of reproductive event (`spawn.date`) along with their daily average temperature and corresponding dates. Alternatively, the function `predict_spawn()` leverages the effective value model framework but works backward from observed or expected development. For example, if a user observed one of the many frog or reptile parameterizations below in an area where they had accurate temperature measurements, they could easily estimate when those individuals adults mated.
+hatchR has two function to predict phenology. The first is `predict_phenology()` where users input date of reproductive event (`spawn.date`) along with their daily average temperature and corresponding dates. Alternatively, the function `predict_spawn()` leverages the effective value model framework but works backward from observed or expected development. For example, if a user observed one of the many frog or reptile parameterizations below in an area where they had accurate temperature measurements, they could easily estimate when those individuals' adults mated.
 
 # Case studies
 
-There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide XXX examples in the table below of studies that could be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic breadth that could be paired with the effective value approach.
+There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide examples spanning four taxonomic classes of pikilotherms in the table below of studies that could liekly be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic breadth that could be paired with the effective value approach. We provide case studies of how these data may be used to address a variety of questions, but expect applications to extend far beyond what we demonstrate here.
 
 | Class | Order | Genera | Species | Study |
 |:--------------|:--------------|:--------------|:--------------|:--------------|
@@ -159,21 +161,18 @@ There are numerous applications for effective value models and poikilotherms tha
 |  |  | *Ascaphus* | *A. truei* | @brown1975 |
 |  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
 | Reptilia | Squamata | *Sceloporus* | *S. undulatus* | @angilletta2000 |
-|  |  | Podarcis | *P. mural*is | @vandamme1992 |
-|  | Testudines | Mauremys | M. reevesii | @du2007 |
+|  |  | *Podarcis* | *P. mural*is | @vandamme1992 |
+|  | Testudines | *Mauremys* | M. reevesii | @du2007 |
 |  |  |  | 181 species | 141 studies in @while2018 |
 | Insecta | Plecoptera | *Nemurella* | *N. pictetii* | @brittain1978, @elliott1984 |
 |  |  | *Capnia* | *C. atra* | @brittain1984 |
 |  |  | *Capnia* | *C. bifrons* | @elliott1986 |
 |  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
 |  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
+|  |  |  | 18 species | Developmental equations in @pritchard1987 |
 | Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
 
-: Sources for effective value parameterizations using `fit_model()` in hatchR. Represented are a broad range of taxa and some review studies which include numerous putative sources.
-
-@while2018 not vetted for completeness
-
-@pritchard1987 contains examples of power equations for 18 insect species
+: Sources for effective value parameterizations using `fit_model()` in hatchR. Represented are a broad range of taxa and some review studies which include numerous putative sources. @while2018 and @pritchard1987 not vetted for full functionality.
 
 ```{r, eval=FALSE}
 
@@ -227,11 +226,9 @@ reptiles |>
   theme_classic()
 ```
 
-examples where other stages could be modeled assuming constant feeding [@lillehammer1986]
-
 ## Ecological
 
-Tailed frog and westlope cutthroat example???
+Recreater @karraker2006 with data from @siegel2023
 
 ## Phylogenetic
 
@@ -396,9 +393,12 @@ P2: Caveats
 P3: Other considerations?
 
 -   easy to parameterize custom models for quick developing species
+-   examples where other stages could be modeled assuming constant feeding [@lillehammer1986]
 
 P4: ???
 
 ### Conclusion
+
+Isn't this a great tool with so many applications!?
 
 # Bibliography
