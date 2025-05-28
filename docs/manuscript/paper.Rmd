@@ -92,9 +92,12 @@ ascaphus_ef$ef <- ef_vals[, 1]
 
 ### plot
 
+fmt <- "~R^2 ==  %.4f"
+lab1 <- sprintf(fmt, ascaphus_mod$r_squared)
 p1 <- ascaphus_mod$pred_plot +
   labs(x = "Incubation Temperature (°C)", y = "Days to Hatch") +
-  lims(y = c(0, 50)) 
+  lims(y = c(0, 50)) +
+  annotate("text", x = 10, y = c(35), label = c(lab1),  hjust = 0, parse = TRUE)
 
 data_1 <- tibble(t = c(0:20), e = seq(0, 0.20, by = 0.01))
 
@@ -236,7 +239,7 @@ Frog example Moore 1939.
 
 Pic labels are wrong, check
 
-```{r, fig.height= 4.5 , fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C (Panel A). Panel B shows the effective values for different mean daily temperatures for each species, which are effectively species-specific linearized developmental reaction norms."}
+```{r, fig.height= 8 , fig.width= 6, fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C (Panel A). Panel B shows the effective values for different mean daily temperatures for each species, which are effectively species-specific linearized developmental reaction norms."}
 
 ### all the Rana's below refer to taxonomy from the paper, they are now genus Lithobates
 
@@ -375,7 +378,7 @@ p2.2 <- ef_vals |> tibble() |>
   theme_classic() +
   theme(legend.position = "none")
 
-p2.1 + p2.2 + plot_annotation(tag_levels = 'A')
+p2.1 / p2.2 + plot_annotation(tag_levels = 'A')
 ```
 
 ## Local Adaptation
