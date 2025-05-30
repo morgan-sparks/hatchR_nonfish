@@ -172,10 +172,11 @@ There are numerous applications for effective value models and poikilotherms tha
 |  |  | *Capnia* | *C. bifrons* | @elliott1986 |
 |  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
 |  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
+|  | Coleoptera | *Colaphellus* | *C. bowringi* | @tang2017 |
 |  |  |  | 18 species | Developmental equations in @pritchard1987 |
 | Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
 
-: Sources for effective value parameterizations using `fit_model()` in hatchR. Represented are a broad range of taxa and some review studies which include numerous putative sources. @while2018 and @pritchard1987 not vetted for full functionality.
+: Sources for effective value parameterizations using `fit_model()` in hatchR. Represented are a broad range of taxa and some review studies which include numerous putative sources. @while2018 and @pritchard1987 not vetted for full functionality and equations would need to be reciprocated.
 
 ```{r, eval=FALSE}
 
@@ -385,6 +386,68 @@ p2.1 / p2.2 + plot_annotation(tag_levels = 'A')
 
 Need an example where multiple populations from the same species are parameterized. ideally not an amphibian
 
+@Tang example using females
+
+Evidence for cogradient clinal adaptation where the farthest south population develops the fastest.
+
+```{r, fig.height= 5 , fig.width= 5, fig.align = 'center', fig.cap="Effective value models developed for five populations of cabbage beetle (females) along a latitudinal cline in China from Tang et al. 2017. Note the large difference in developmental rate between Xiushui County and the other, more notherly populations, which is indicative of cogradient variation."}
+tang_temps <- c(16,19,22,24,26,28) 
+
+
+hb <- c(24.834, 19.481, 14.172, 11.205, 9.865, 8.570)
+
+sy <- c( 23.822, 19.129, 13.644, 10.897, 9.645, 8.306)
+
+ta <- c( 21.887, 18.381, 12.984, 10.809, 9.382, 8.130)
+
+xy <- c( 21.623, 18.337, 12.589, 10.633, 9.205, 8.085 )
+
+xs <- c( 21.271, 16.666, 11.797, 9.929, 9.117, 6.942)
+
+pop_list <- list(hb, sy, ta, xy, xs)
+
+beetle_mods <- pop_list |> map(fit_model,
+                temp = tang_temps,
+                species = "cabbage beetle",
+                development_type = "hatch") |> 
+  map("expression") |> 
+  map("expression") |> 
+  unlist()
+
+temps <- c(12:30)
+pops = c("Haerbin City", 
+         "Shenyang City", 
+         "Taian City",
+         "Xinyang County",
+         "Xiushui County")
+
+ef_vals_pops <- NULL
+
+for( m in 1:length(beetle_mods)){
+  mod = beetle_mods[m]
+  pop = pops[m]
+
+for (x in temps) {
+  ef <- eval(parse(text = mod))
+  temp_df <- data.frame(temperature = x, 
+                        effective_value = ef, 
+                        beetle_pops = pop)
+  ef_vals_pops <- rbind(ef_vals_pops, temp_df)
+  
+  }
+}
+
+ef_vals_pops |> tibble() |> 
+  ggplot(aes(x = temperature, y = effective_value, color = beetle_pops)) +
+  geom_line() +
+  geom_point() +
+  #geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
+  labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
+  scale_color_brewer(palette = "Dark2", name = "Beetle Populations") +
+  theme_classic() +
+  theme(legend.position = c(0.25, 0.75))
+```
+
 # Discussion
 
 P1: Summary of above
@@ -392,6 +455,7 @@ P1: Summary of above
 P2: Caveats
 
 -   namely that some taxa like insects and frogs are much more likely to bail on development when environmental cues suggest they need to
+-   more studies need to include more than 2 temperatures @qualls1998 @kozák2009
 
 P3: Other considerations?
 
