@@ -18,6 +18,8 @@ knitr::opts_chunk$set(echo = FALSE,
 library(hatchR)
 library(tidyverse)
 library(patchwork)
+library(ggridges)
+library(modelbased)
 ```
 
 # A generalizable tool for predicting developmental phenology for wild poikilotherms.
@@ -232,7 +234,128 @@ reptiles |>
 
 ## Ecological
 
-Recreater @karraker2006 with data from @siegel2023
+Recreate @karraker2006 with data from @siegel2023
+
+```{r, eval=FALSE}
+ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
+
+
+#########################################
+# ONLY RUN IF YOU DOWNLOAD SIEGEL FILES #
+#########################################
+
+
+# print huc_6 to download from https://zenodo.org/records/8174951
+
+huc_6 <-ascaphus_sites |> 
+  drop_na(comid) |> 
+  pull(HUC_6) |> 
+  unique()
+
+ascaphus_siegel_data <- NULL
+
+for( h in huc_6 ){
+huc_6_files <- fs::dir_ls(paste0("../../data/siegel_data/st_pred_", h))
+
+#filter to huc10 to subset files
+huc_10 <- ascaphus_sites |> 
+  filter(HUC_6 == h) |> 
+  pull(HUC_10) |> 
+  unique()
+
+# get comids to filter mega df created below
+comids <- ascaphus_sites |> 
+  drop_na(comid) |> 
+  filter(HUC_10 %in% huc_10) |> 
+  pull(comid) |> 
+  unique()
+
+# change to single character for pattern in function below
+huc_10_patterns <- ifelse(length(huc_10) >1, paste0(huc_10, collapse = "|"), paste0(huc_10))
+
+# put files in a df together
+huc_10_df <- huc_6_files |>
+  str_subset(pattern = (huc_10_patterns)) |> # str subset on huc10
+  map_df(read_csv, .id = "file", col_types = cols()) |> 
+  filter(COMID %in% comids)
+
+#append to single file
+ascaphus_siegel_data <- rbind(ascaphus_siegel_data, huc_10_df)
+
+}
+
+write_rds( ascaphus_siegel_data, "../../data/ascaphus_siegel_data.rds", compress = "gz" )
+```
+
+\
+
+```{r, fig.height= 6 , fig.width= 8, fig.align = 'center', fig.cap="Estimated marginal means of days to hatch for coastal tailed frogs from various mountain ranges across their range."}
+ascaphus_siegel_data <- readRDS("../../data/ascaphus_siegel_data.rds") |> 
+  mutate(date = ymd(tim.date))
+
+ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
+
+#karraker_data <- readxl::read_xls("../../data/ASMO_ASTR_egg_data.xls")
+
+spawn_dates <- map(
+  c(1991:2020), # year vector to map for custom function
+  function(year) { # custom function to make dates
+      paste0(year, "-07-24")
+    }
+  ) |> 
+  unlist()
+
+pred_hatch = NULL
+for(sites in unique(ascaphus_siegel_data$COMID)) {
+  
+  site <-  ascaphus_siegel_data |> filter( COMID == sites) |> drop_na(prd.stream_temp)
+  
+ # spawn_dates <- spawn_dates[which(spawn_dates %in% site$tim.date)]
+  
+  hatch <- map(spawn_dates, 
+               predict_phenology,
+              data = site,
+              temperature = prd.stream_temp,
+              dates = date,
+              model = ascaphus_mod$expression$expression) |> 
+    map_dbl("days_to_develop")
+  
+  temp_df <- data.frame(days = hatch,
+                        comid = rep(sites, times =length(hatch)),
+                        year = year(spawn_dates))
+  
+  pred_hatch <- rbind(pred_hatch, temp_df)
+}
+
+pred_hatch <- pred_hatch |> 
+  left_join(ascaphus_sites |> group_by(comid) |> slice_head( n =1), by = join_by(comid == comid))
+
+# pred_hatch |> 
+#   mutate(comid = as.factor(comid)) |> 
+#   ggplot() +
+#   geom_density_ridges(aes(y = year, x = days + ymd("2001-07-14"), fill = comid)) +
+#   theme_classic() +
+#   theme(legend.position = "none")
+# 
+# pred_hatch |> 
+#   mutate(comid = as.factor(comid)) |> 
+#   ggplot(aes(x = year, y = days , color= Mountain, group = comid)) +
+#   geom_point() +
+#   #geom_line() +
+#   geom_smooth(method = "lm", se = FALSE) +
+#   labs(x= "Year", y = "Hatch Date") +
+#   theme_classic() +
+#   theme(legend.position = c(0.8, 0.75))
+
+mod <- lm(days ~ year*Mountain, data = pred_hatch)
+# sjPlot::tab_model(mod)
+
+estimate_means(mod, c("year", "Mountain")) |> 
+  plot() +
+  #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
+  labs(x = "Year", y = "Mean of Days to Hatch") +
+  theme_classic()
+```
 
 ## Phylogenetic
 
@@ -386,7 +509,7 @@ p2.1 / p2.2 + plot_annotation(tag_levels = 'A')
 
 Need an example where multiple populations from the same species are parameterized. ideally not an amphibian
 
-@Tang example using females
+@tang2017 example using females
 
 Evidence for cogradient clinal adaptation where the farthest south population develops the fastest.
 
