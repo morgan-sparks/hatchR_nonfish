@@ -15,8 +15,11 @@ knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE,
                       message = FALSE)
 
+
 library(hatchR)
+library(here)
 library(tidyverse)
+library(readxl)
 library(patchwork)
 library(ggridges)
 library(modelbased)
@@ -34,37 +37,37 @@ Morgan M. Sparks^1^, Brian Z. Leavell^2^, Bryan M. Maitland^1^
 
 # Abstract
 
-Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
+Development in poikilothermic organisms is strongly temperature-dependent, particularly during early life stages prior to exogenous feeding. This thermally constrained physiology produces a near-mechanistic relationship between ambient temperature and developmental rate, allowing for predictive models of phenology. However, traditional models—often developed under constant laboratory temperatures—struggle to account for the variable thermal regimes experienced by wild populations. To address this, [@sparks2019] introduced the effective value model, a framework that integrates daily temperature data to predict developmental timing under fluctuating conditions. Building on this foundation, the R package **hatchR** was developed to operationalize the effective value model and enable its widespread application, initially focusing on fishes. In this paper, we expand the scope of **hatchR**, demonstrating its applicability across a broad range of poikilothermic taxa, including amphibians, reptiles, and aquatic invertebrates. We also illustrate how this framework supports both applied management goals—such as predicting hatching windows for conservation and monitoring—and basic research on ecological and evolutionary questions, including phenological plasticity, thermal adaptation, and life history strategies. By providing a generalizable, open-source tool, **hatchR** bridges the gap between physiological theory and real-world application, offering a robust platform for predicting developmental phenology in diverse and changing environments.
 
 \newpage
 
 # Introduction
 
-MORE CITATIONS
+Because poikilothermic organisms rely on external sources to regulate their body temperature, the physiological processes governing their growth and development are tightly coupled to ambient thermal conditions. This relationship is especially deterministic during early life stages prior to exogenous feeding, when metabolic rates are primarily governed by environmental temperatures, modulated by genetic and maternal effects [@west-eberhard2003]. Although the absolute rate of development can vary widely among species and populations, most poikilotherms exhibit a consistent and often non-linear thermal performance curve that describes development as a function of temperature [@schoolfield1981; @angilletta2006]. These relationships can be effectively approximated with power law or exponential models that capture increasing developmental rates with rising temperature, up to a physiological optimum beyond which performance declines.
 
-Because poikilothermic organisms rely on the environment to determine their body temperature, the physiological processes that regulate their bodies is tightly linked with their ambient temperature. When these organisms are in their early life histories prior to exogenous feeding, developmental rates are solely determined by environmental and genetic and/or maternal effects, with the environmental responsible for most of the variation in phenotypes [@west-eberhard2003]. In turn, while developmental rates may vary widely across species, they typically fit a consistent non-linear relationship with temperature which can be easily mathematically approximated using the power law.
+Historically, models of developmental phenology in wild populations have relied on the accumulation of degree days (thermal sums) above a species-specific threshold. While widely used, degree-day models are fundamentally linear and fail to account for the non-linear nature of development, leading to biased predictions under fluctuating temperature regimes [@neuheimer2007]. This is particularly problematic for long-developing species or for organisms in variable climates, where embryos incubating at colder temperatures often require fewer thermal units to complete development than those incubating in warmer environments. Moreover, traditional models often assume temporally invariant developmental rates and do not incorporate diel temperature variability, which can significantly affect development in systems with large day–night thermal swings. Finally, developmental reaction norms may vary across populations due to local adaptation or phenotypic plasticity, further complicating predictions [@sparks2017; @angilletta2009].
 
-Historically, predicting developmental rates for populations in the wild relied on thermal thresholds where degree days are summed from mating and phenology occurs once a thermal threshold is passed. However, these models can be error prone, especially for longer developing species, because of the non-linearity of development, where embryos developing at colder temperatures need far fewer degree days to hatch than those at warm temperatures. Similarly, when applied to wild environments models fail to account for diel variabilty, where daily (and hence developmental rates) may be highly different across early life history development. Finally, populations may be locally adapted with developmental rates varying across populations [@sparks2017].
+To address these limitations in fishes, [@sparks2019] introduced the effective value model—an approach that captures the non-linear, temperature-dependent nature of development by integrating experimental data into a daily developmental rate function. Building on that work, the R package **hatchR** [CITE hatchR] was developed to operationalize the effective value framework and make it accessible to researchers and managers. **hatchR** uses temperature-performance curves generated from lab-based thermal rearing trials to estimate the proportion of development achieved each day under observed temperature conditions. These daily contributions are summed until a cumulative threshold (typically 1.0) is reached, marking the completion of a developmental stage. The package includes both an R-based workflow and a user-friendly Shiny web interface to facilitate broad adoption across research and management communities.
 
-To address these issues in fishes, ***Sparks et al.*** (XXX)developed hatchR, which leverages effective value models developed by @sparks2019. The models function using developmental curves fit from experiments where organisms are raised at different temperatures and reciprocating those models to provide daily development estimates and are readily applied to wild environments. hatchR is packaged as an available R package on CRAN, as well as a Shiny app presented as a graphical-user-interface. While hatchR was developed specifically for fishes, the approach functions equally well for any poikilotherm for which development roughly follows a power law relationship. Here, we demonstrate the wide applicability of hatchR to non-fish organisms providing numerous putative sources for parameterizing developmental models across broad taxa and three specific examples of how hatchR can be used to investigate questions regarding ecological and inter- and intraspecies relationships.
+While hatchR was originally developed for coldwater fishes, the approach is broadly applicable to any poikilothermic organism whose development conforms to a monotonic or unimodal temperature–rate relationship, including many amphibians, reptiles, and invertebrates. In this manuscript, we expand the taxonomic scope of **hatchR**, compiling thermal developmental data from the literature and demonstrating how effective value modeling can be applied to diverse taxa. We also present three case studies illustrating how **hatchR** can inform ecological, evolutionary, and management questions—ranging from understanding thermal adaptation and phenological mismatches to forecasting hatch timing in conservation planning. These applications are increasingly relevant as freshwater ecosystems face intensifying and interacting stressors, including climate change, habitat alteration, and invasive species, all of which can disrupt developmental timing and population dynamics [@craig2017; ADD ANOTHER BROAD PAPER].
 
 # Methods
 
 ## Effective value models
 
-Effective value models function by leveraging the statistical relationship derived from raising poikilotherms at different temperatures and fitting that relationship with a non-linear model. The formulation of that relationship can then be reciprocated which provides the unit of development for a day's average temperature--an effective value. Effective value models function then by cumulatively summing to one at which the organism achieves the development of the parameterized trait.
+Effective value models estimate developmental progress based on empirically derived relationships between temperature and development rate. These relationships are typically parameterized by raising organisms at constant temperatures in laboratory settings, then fitting a non-linear function that captures the temperature-dependence of development. This function can then be reciprocated to produce daily “effective values”—units of development—that accumulate over time.
 
-The model follows the general format of:
+Each day's developmental contribution is calculated using the general power-law form:
 
 $$
 Effective Value_i = 1/exp(log_ea - log_e(Temperature_i - b))
 $$
 
-Where *i* is the daily value and a fish hatches or emerges when the cumulative sum reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
+where *i* is the index for each day, *a* and *b* are empirically derived parameters, and temperature is the average for that day. Development is complete once the cumulative sum of daily effective values reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
 
-As an example, we parameterize an effective value model for coastal tailed frogs (*Ascaphus truei*) common to western North America (Figure 1). Custom parameterized models use the `fit_model()` function in hatchR, which is built on model 2 using the power law from @beacham1990. Alternatively, to predict phenology using hatchR, the `predict_phenology()` only requires a model expression as input and could assume other model formulations custom built outside of the package by the user.
+To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure \@ref(fig:tail-frog)). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data (**CITE**). While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions. 
 
-```{r, fig.align = 'center', fig.cap="Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
+```{r tail-frog, fig.width=8, fig.height=3, fig.align='center', fig.cap="Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
 # https://www.sciencedirect.com/science/article/pii/030096297590033X
 
@@ -115,15 +118,11 @@ p2 <- ascaphus_ef |>
 p1 + p2 + plot_annotation(tag_levels = 'A')
 ```
 
-## Data and data checks
+## Data input and quality checks
 
-hatchR requires two essential paired vectors of data, one of daily average temperature and the other the date for those temperatures. The software is designed to function around common field temperature loggers and provides users the ability to summarize temperatures with multiple daily recordings.
+**hatchR** requires two core inputs: a vector of daily average water temperatures and a corresponding vector of calendar dates. These data are typically collected from field-deployed temperature loggers. For loggers that record sub-daily temperatures, **hatchR** includes the function `summarize_temp()` to compute daily means. Data completeness and consistency can be checked using `plot_check_temp()` and `check_continuous()` to ensure there are no gaps or anomalies in the temperature record (Table \@ref(tab:eg-temp-data)).
 
-### Data input
-
-Maybe include the below:
-
-```{r}
+```{r eg-temp-data}
 df <- data.frame(
   date = c(
     "2024-01-01",
@@ -143,7 +142,7 @@ df <- data.frame(
 
 knitr::kable(df,
   booktabs = TRUE,
-  caption = "Example temperature data for use in hatchR."
+  caption = "Example water temperature data. Temperature data are typically collected from field loggers and summarized to daily averages. Each row represents a date–temperature pair used to estimate daily effective values for phenology modeling."
 )
 ```
 
@@ -151,11 +150,13 @@ If you import data from raw files with multiple daily readings, the package allo
 
 ## Predicting phenology
 
-hatchR has two function to predict phenology. The first is `predict_phenology()` where users input date of reproductive event (`spawn.date`) along with their daily average temperature and corresponding dates. Alternatively, the function `predict_spawn()` leverages the effective value model framework but works backward from observed or expected development. For example, if a user observed one of the many frog or reptile parameterizations below in an area where they had accurate temperature measurements, they could easily estimate when those individuals' adults mated.
+Developmental phenology can be predicted in two ways using hatchR. The `predict_phenology()` function estimates the date at which development completes, given a known reproductive event (e.g., oviposition or spawning; `spawn.date`) and daily temperature data. Alternatively, the `predict_spawn()` function works in reverse—estimating the likely date of a reproductive event based on a known or observed hatch/emergence date. This is especially useful for retrospective analyses or for estimating breeding windows from field observations. 
+
+**BMM NOTE: Seems like we should include a figure of output here. Could just add a panel to figure 1 with days to develop plot.**
 
 # Case studies
 
-There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide examples spanning four taxonomic classes of pikilotherms in the table below of studies that could liekly be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic breadth that could be paired with the effective value approach. We provide case studies of how these data may be used to address a variety of questions, but expect applications to extend far beyond what we demonstrate here.
+The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. Below, we provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature. These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span four taxonomic classes—amphibians, reptiles, insects, and crustaceans—and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
 
 | Class | Order | Genera | Species | Study |
 |:---|:---|:---|:---|:---|
@@ -178,7 +179,7 @@ There are numerous applications for effective value models and poikilotherms tha
 |  |  |  | 18 species | Developmental equations in @pritchard1987 |
 | Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
 
-: Sources for effective value parameterizations using `fit_model()` in hatchR. Represented are a broad range of taxa and some review studies which include numerous putative sources. @while2018 and @pritchard1987 not vetted for full functionality and equations would need to be reciprocated.
+: Example sources for effective value parameterization using `fit_model()` in **hatchR.** This compilation spans amphibians, reptiles, aquatic and terrestrial insects, and decapod crustaceans. Some entries, such as @while2018 and @pritchard1987, represent broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
 
 ```{r, eval=FALSE}
 
@@ -232,9 +233,188 @@ reptiles |>
   theme_classic()
 ```
 
-## Ecological
+## Ecological Appication: Spatial and Temporal Trends in Development
 
-To demonstrate an ecological application for hatchR, we used estimates for oviposition timing for *A. truei* from @karraker2006 (unpublished data). Using the parameterized coastal tailed frog model presented above (Figure 1) and assumed a fixed oviposition date based on the estimates from @karraker2006 we predicted days to hatch for populations in Washington and Oregon, where long-term temporal predictions of stream temperature were available [@siegel2023] at the COMID level. Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with average days to hatch taking more than twice as long in Olympic National Park as in the Willapa Hills (32 days compared to 15 days). When broken down by site, there was a weak but significant relationship between year and days to hatch (Supplemental Data), with slight negative trend over the thirty year period, indicating temperatures at the sites were warming (Figure 2). Over the 30-year period, the site with the quickest average developmental period was in the Willapa Hills (15 days) and the site with the longest average developmental period was in Olympic National Park (44 days). Finally, the standard deviation at Willapa Hills, Siskiyou Mountains, and Cascade Mountains was much lower (\<3) than that of the Olympic National Park sites (11.0) indicating much greater sensitivity to temperature change over the past 30-years in the park.
+To demonstrate an ecological application for **hatchR**, we modeled variation in developmental timing for coastal tailed frogs (*A. truei*) across their range in the Pacific Northwest. Using oviposition estimates from @karraker2006 (unpublished data) and our earlier parameterized effective value model (Figure \@ref(fig:tail-frog)), we simulated daily development across 30 years (1991-2020) using modeled stream temperature data from @siegel2023. 
+
+```{r tail-frog-pheno}
+# Read data
+ascaphus_siegel_data <- readRDS(here("data/ascaphus_siegel_data.rds")) |>
+  mutate(date = ymd(tim.date))
+
+ascaphus_sites <- read_xlsx(here("data/ascaphus_locations.xlsx")) |> 
+  drop_na(comid)
+
+# karraker_data <- readxl::read_xls("../../data/ASMO_ASTR_egg_data.xls")
+
+pred_hatch <- NULL
+for (sites in unique(ascaphus_siegel_data$COMID)) {
+  ascaphus_site <- ascaphus_sites |> filter(comid == sites)
+
+  month <- month(ascaphus_site$oviposition_date)
+  mday <- mday(ascaphus_site$oviposition_date)
+
+  spawn_dates <- map(
+    c(1991:2020), # year vector to map for custom function
+    function(year) { # custom function to make dates
+      paste0(year, "-", month, "-", mday)
+    }
+  ) |>
+    unlist()
+
+  site <- ascaphus_siegel_data |>
+    filter(COMID == sites) |>
+    drop_na(prd.stream_temp)
+
+  # spawn_dates <- spawn_dates[which(spawn_dates %in% site$tim.date)]
+
+  hatch <- map(spawn_dates,
+    predict_phenology,
+    data = site,
+    temperature = prd.stream_temp,
+    dates = date,
+    model = ascaphus_mod$expression$expression
+  ) |>
+    map_df("dev_period") |>
+    mutate(days = stop - start)
+
+  temp_df <- data.frame(
+    days = hatch$days,
+    comid = rep(sites, times = length(hatch)),
+    year = year(spawn_dates)
+  )
+
+  pred_hatch <- rbind(pred_hatch, temp_df)
+}
+
+model_data <- pred_hatch |>
+  left_join(ascaphus_sites |> 
+              group_by(comid) |> 
+              slice_head(n = 1), 
+            by = join_by(comid == comid)
+            ) |>
+  mutate(
+    days = as.integer(days),
+    comid = as.factor(comid)
+    )
+
+# model_data |>
+#   ggplot() +
+#   geom_density_ridges(aes(y = as.factor(year), x = days , fill = Mountain)) +
+#   theme_classic() +
+#   theme(legend.position = "none")
+# 
+# model_data |>
+#   ggplot(aes(x = year, y = days , color= Mountain, group = comid)) +
+#   geom_point() +
+#   #geom_line() +
+#   geom_smooth(method = "lm", se = FALSE) +
+#   labs(x= "Year", y = "Hatch Date") +
+#   theme_classic() +
+#   theme(legend.position = c(0.8, 0.75))
+
+model_data <- model_data |> 
+  mutate(Mountain = as.factor(Mountain), 
+         comid = as.factor(comid))
+
+mtns <- model_data |> distinct(Mountain) |>
+  as_tibble() |> pull(Mountain) |> 
+  stringr::str_c(collapse = ", ")
+
+mean_dev_mtn <- model_data |> 
+  drop_na(days) |>  
+  group_by(Mountain) |> 
+  summarise(mean_hatch = round(mean(days), 1),
+            sd_hatch =sd(days))
+
+mean_dev_comid_mtn <- model_data |> 
+  drop_na(days) |>  
+  group_by(Mountain, comid) |> 
+  summarise(mean_hatch = round(mean(days), 1))
+
+```
+
+The dataset included `r nrow(model_data)` observations of predicted days to hatching, drawn from `r length(unique(model_data$comid))` stream reaches (COMIDs) nested within four mountain ranges: Olympic National Park, the Cascade Mountains, the Siskiyou Mountains, and the Willapa Hills. Each COMID had between 20 and 30 years of predictions. 
+
+We evaluated eight candidate linear models that varied in the inclusion and interaction of year, COMID, and mountain range effects. Based on adjusted R², AICc, and RMSE, the best-supported model included year and COMID as additive fixed effects: days_to_hatch ~ year + comid. 
+
+```{r frog-mods}
+# mod <- lm(days ~ year * comid + Mountain, data = model_data)
+
+m1 <- lm(days ~ year, data = model_data)
+m2 <- lm(days ~ year + comid, data = model_data)
+m3 <- lm(days ~ year + Mountain, data = model_data)
+m4 <- lm(days ~ year + comid + Mountain, data = model_data)
+m5 <- lm(days ~ year * comid, data = model_data)
+m6 <- lm(days ~ year * comid + Mountain, data = model_data)
+m7 <- lm(days ~ year * Mountain, data = model_data)
+m8 <- lm(days ~ year * Mountain + comid, data = model_data)
+
+# sjPlot::tab_model(m2)
+
+perf <- performance::compare_performance(
+  m1, m2, m3, m4, m5, m6, m7, m8,
+  rank = TRUE
+)
+
+params <- parameters::model_parameters(m2)
+```
+
+This model explained ~`r round(perf[1,4], 2)*100`% of the variation in developmental timing (adjusted R² = `r round(perf[1,4], 3)`), with year having a significant weak and negative effect (`r round(params[2,2], 2)` days/year, p = 0.001), indicating an overall trend toward faster development consistent with regional warming (Figure \@ref(fig:frog-preds)A). COMID effects captured the persistent differences in thermal regimes among streams, with estimated marginal means ranging from ~15 to ~44 days to hatch across sites (Figure \@ref(fig:frog-preds)B).
+
+```{r frog-preds, fig.height=3 , fig.width=8, fig.align='center', fig.cap="Modeled changes in developmental timing for coastal tailed frogs (Ascaphus truei) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals."}
+
+# plot(estimate_means(m2, c("year"), preserve_range = TRUE))
+# plot(estimate_means(m2, c("comid"), preserve_range = TRUE))
+# plot(estimate_means(m2, c("year", "comid"), preserve_range = TRUE))
+
+means_all <- estimate_means(m2, c("year"), preserve_range = TRUE) |> 
+  tibble()
+
+p.01 <- means_all |> 
+  ggplot(aes(year, Mean, ymin = CI_low, ymax = CI_high)) +
+  geom_ribbon(alpha = 0.05, color = NA) +
+  geom_line(size = 1.1)  +
+  labs(x = "Year", y = "Mean of Days to Hatch") +
+  theme_classic()
+
+means <- estimate_means(m2, c("year", "comid"), preserve_range = TRUE) |> 
+  tibble() |>
+  mutate(comid = as.integer(as.character(comid))) |>
+  left_join(
+    ascaphus_sites |> distinct(comid, Mountain),
+    by = join_by(comid == comid)
+  ) |>
+  mutate(comid = as.factor(comid)) 
+
+p.02 <- means |> 
+  ggplot(
+    aes(
+      x = year, y = Mean,
+      ymin = CI_low, ymax = CI_high,
+      group = comid,
+      fill = Mountain,
+      color = Mountain, 
+      # linetype = comid
+    )
+  ) +
+  geom_line(size = 1.1) +
+  geom_ribbon(alpha = 0.05, color = NA) +
+  labs(x = "Year", y = "Mean of Days to Hatch") +
+  theme_classic()
+
+p.01 + p.02 + plot_annotation(tag_levels = 'A')
+
+
+# estimate_means(mod, c("year", "comid")) |>
+#   plot() +
+#   #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
+#   labs(x = "Year", y = "Mean of Days to Hatch") +
+#   theme_classic()
+```
+
+Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with sites in Olympic National Park consistently having the longest development times and the greatest interannual variability (SD ~ 11 days), while lowland streams in the Willapa Hills developed fastest with minimal variability (SD < 3 days). These results demonstrate the capacity of **hatchR** to detect spatiotemporal phenological variation and forecast potential shifts under shifting climate patterns.
+
 
 ```{r, eval=FALSE}
 ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
@@ -287,126 +467,18 @@ ascaphus_siegel_data <- rbind(ascaphus_siegel_data, huc_10_df)
 write_rds( ascaphus_siegel_data, "../../data/ascaphus_siegel_data.rds", compress = "gz" )
 ```
 
-\
 
-```{r, fig.height= 6 , fig.width= 8, fig.align = 'center', fig.cap="Estimated marginal means of days to hatch for coastal tailed frogs from various mountain ranges across their range."}
-ascaphus_siegel_data <- readRDS("../../data/ascaphus_siegel_data.rds") |> 
-  mutate(date = ymd(tim.date))
+## Phylogenetic Application: Species Differences in Developmental Rates / Reaction Norms
 
-ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
+Closely related species often diverge in their thermal tolerances and developmental strategies as part of niche differentiation. These differences can be visualized through reaction norms that capture genotype-by-environment (G×E) interactions, often derived from common garden or reciprocal transplant experiments. While such experiments are ideal for isolating genetic and plastic components of trait variation, they are logistically demanding and rarely available for many taxa.
 
-#karraker_data <- readxl::read_xls("../../data/ASMO_ASTR_egg_data.xls")
+**hatchR** offers a complementary approach by generating species-specific developmental models from published thermal rearing studies and applying them to shared temperature regimes. While this does not replace controlled experiments, it enables estimation of thermal reaction norms for development across species, even when the original experiments were conducted independently. By visualizing differences in effective value slopes and phenological outcomes under shared conditions, **hatchR** can highlight how developmental traits vary with phylogeny and ecological strategy.
 
+To demonstrate this approach, we leveraged data from @moore1939 to parameterize developmental models for four widely distributed North American frog species in the genus *Lithobates*: wood frog (*L. sylvaticus*), pickerel frog (*L. palustris*), northern leopard frog (*L. pipiens*), and green frog (*L. clamitans*). These species co-occur in parts of eastern North America but differ in their breeding phenology, habitat associations, and thermal niches. For example, wood frogs are early breeders in cold, ephemeral wetlands, while green frogs breed later in more permanent, warmer waters.
 
+We applied the custom parameterized models to two hypothetical spring temperature regimes with mean daily temperatures of 16 °C (cool) and 24 °C (warm). Under the cool regime, wood frogs hatched earliest while green frogs lagged behind by up to eight days—nearly double the developmental duration (Figure \@ref(fig:litho-pheno)A). However, under the warm regime, predicted hatch dates clustered tightly, with all species hatching within one day of each other (Figure \@ref(fig:litho-pheno)B). The effective value slopes (Figure \@ref(fig:litho-pheno)C) reveal these underlying differences in developmental response curves, serving as species-specific linearized reaction norms. Notably, the rank order of developmental timing reverses across the two thermal regimes, a hallmark of strong G×E interaction.
 
-pred_hatch = NULL
-for(sites in unique(ascaphus_siegel_data$COMID)) {
-  
-  ascaphus_site <- ascaphus_sites |> filter(comid == sites)
-  
-  month <- month(ascaphus_site$oviposition_date)
-  mday <- mday(ascaphus_site$oviposition_date)
-  
-  spawn_dates <- map(
-  c(1991:2020), # year vector to map for custom function
-  function(year) { # custom function to make dates
-      paste0(year,"-", month, "-", mday)
-    }
-  ) |> 
-  unlist()
-  
-  site <-  ascaphus_siegel_data |> filter( COMID == sites) |> drop_na(prd.stream_temp)
-  
- # spawn_dates <- spawn_dates[which(spawn_dates %in% site$tim.date)]
-  
-  hatch <- map(spawn_dates, 
-               predict_phenology,
-              data = site,
-              temperature = prd.stream_temp,
-              dates = date,
-              model = ascaphus_mod$expression$expression) |> 
-    map_df("dev_period") |> 
-    mutate(days = stop -start)
-  
-  temp_df <- data.frame(days = hatch$days,
-                        comid = rep(sites, times =length(hatch)),
-                        year = year(spawn_dates))
-  
-  pred_hatch <- rbind(pred_hatch, temp_df)
-}
-
-model_data <- pred_hatch |> 
-  left_join(ascaphus_sites |> group_by(comid) |> slice_head( n =1), by = join_by(comid == comid)) |> 
-  mutate(days = as.integer(days),
-         comid = as.factor(comid))
-
-# model_data |>
-#   ggplot() +
-#   geom_density_ridges(aes(y = as.factor(year), x = days , fill = Mountain)) +
-#   theme_classic() +
-#   theme(legend.position = "none")
-# 
-# model_data |>
-#   ggplot(aes(x = year, y = days , color= Mountain, group = comid)) +
-#   geom_point() +
-#   #geom_line() +
-#   geom_smooth(method = "lm", se = FALSE) +
-#   labs(x= "Year", y = "Hatch Date") +
-#   theme_classic() +
-#   theme(legend.position = c(0.8, 0.75))
-
-mod <- lm(days ~ year*as.factor(comid) + Mountain, data = model_data)
-
-means <- estimate_means(mod, c("year", "comid")) |>  tibble()
-
-means  |> 
-  mutate(comid = as.integer(as.character(comid))) |> 
-  left_join(ascaphus_sites, by = join_by(comid == comid)) |> 
-  ggplot(aes(x = year,
-             y = Mean,
-                  ymin= CI_low, 
-                  ymax = CI_high,
-                  group = comid,
-                  fill = Mountain,
-             color = Mountain)) +
-  geom_line(size = 1.1) +
-  geom_ribbon(alpha = 0.05, color = NA) +
-  labs(x = "Year", y = "Mean of Days to Hatch") +
-  theme_classic()
-
-# estimate_means(mod, c("year", "comid")) |> 
-#   plot() +
-#   #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
-#   labs(x = "Year", y = "Mean of Days to Hatch") +
-#   theme_classic()
-```
-
-```{r, eval=FALSE}
-
-model_data |> 
-  drop_na(days) |>  
-  group_by(Mountain) |> 
-  summarise(mean_hatch = round(mean(days), 1),
-            sd_hatch =sd(days))
-
-model_data |> 
-  drop_na(days) |>  
-  group_by(Mountain, comid) |> 
-  summarise(mean_hatch = round(mean(days), 1))
-
-sjPlot::tab_model(mod)
-```
-
-## Phylogenetic
-
-As species diverge from one another it is expected that phenotypes respond to different niche space which is part of that divergence. To assess those differences,one can execyte experiments that test phenotypic divergence (common garden or reciprocal transplant) and display phenotypic data as reaction norms, showing the relative genetic and environmental contribution to phenotypes. hatchR is a unique tool for demonstrating these differences because the strong fits of developmental rates, either displayed as model fits or the linearized effective value model lines are forms of reaction norms, even if species did not experience the same developmental conditions. While not as precise as using controlled experiments, hatchR derived reaction norms can be used to demonstrate how genetic x environment interactions vary among species and how those phenotypes may fit the niche spaces occupied by phylogenetically close or divergent species.
-
-To demonstrate this approach, we leverage custom time to hatch parameterizations for four *Lithobates* frog species developed by @moore1939. We show large differences in developmental rates for common North American frogs which often overlap in their ranges—green frog, *L. clamitans*; northern leopard frog, *L. pipiens*; pickerel frog, *L. palustris*; and wood frog, *L. sylvaticus*. Specifically, when developmental models were fit to a randomly generated temperature regime of 16 and 24 C°, the species-specific effects of devlopment are clear. Whereas at warm temperatures, all species hatch the same day or within one day of one another, at cold temperatures, wood frogs develop the quickest and green frogs the slowest (twice the rate of wood frogs).
-
-BRIAN ADD SOMETHING ABOUT THEIR ECOLOGY ABOVE TO FIT THIS INTO BROADER CONTEXT.
-
-```{r, fig.height= 8 , fig.width= 8, fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C (Panel A) and mean 24 °C (Panel B). Panel C shows the effective values for different mean daily temperatures for each species, which are effectively species-specific linearized developmental reaction norms. Note the genetic x environment interactions in Panel C as temperatures warm and shown by the rank order change in species in Panel A compared with Panel B."}
-
+```{r litho-pheno, fig.height=8 , fig.width=8, fig.align='center', fig.cap="Custom hatch timing models developed for four North American *Lithobates* frog species. Models are parameterized from @moore1939 and phenology is predicted using two synthetic temperature regimes: Panel A shows predictions under a cooler regime (mean = 16 °C), while Panel B shows predictions under a warmer regime (mean = 24 °C). Panel C displays the effective value curves for each species—linearized approximations of thermal reaction norms. The crossover in rank order between Panels A and B illustrates genotype-by-environment interactions, reflecting species-specific thermal niches and breeding strategies."}
 ### all the Rana's below refer to taxonomy from the paper, they are now genus Lithobates
 
 # Rana sylvatica ----------------------------------------------------------
@@ -414,270 +486,308 @@ BRIAN ADD SOMETHING ABOUT THEIR ECOLOGY ABOVE TO FIT THIS INTO BROADER CONTEXT.
 # Moore, 1939 Ecology
 # https://www.jstor.org/stable/1930439?seq=1
 
-rana_s_data <- tibble(temp = c(9, 21 ,26),
-                      days = c(15,13,4))
+rana_s_data <- tibble(
+  temp = c(9, 21, 26),
+  days = c(15, 13, 4)
+)
 
-rana_s_data <- tibble(temp = c(10,15.3,18.5,19.9, 23.7),
-                      hours = c(305,128,87,79,52)) |>
-  mutate(days = ceiling(hours/24))
+rana_s_data <- tibble(
+  temp = c(10, 15.3, 18.5, 19.9, 23.7),
+  hours = c(305, 128, 87, 79, 52)
+) |>
+  mutate(days = ceiling(hours / 24))
 
-rana_s_mod <- fit_model(temp = rana_s_data$temp,
-                        days = rana_s_data$days,
-                        species = "Rana_sylvatica",
-                        development_type = "hatch")
+rana_s_mod <- fit_model(
+  temp = rana_s_data$temp,
+  days = rana_s_data$days,
+  species = "Rana_sylvatica",
+  development_type = "hatch"
+)
 
 
 # Rana pipiens -----------------------------------------------------------
 # from Moore 1939
 
-rana_pip_data <- tibble(temp = c(15.3,18.6,19.8, 26),
-                        hours = c(168,116,99,57)) |>
-  mutate(days = ceiling(hours/24))
+rana_pip_data <- tibble(
+  temp = c(15.3, 18.6, 19.8, 26),
+  hours = c(168, 116, 99, 57)
+) |>
+  mutate(days = ceiling(hours / 24))
 
-rana_pip_mod <- fit_model(temp = rana_pip_data$temp,
-                          days = rana_pip_data$days,
-                          species = "Rana_pipiens",
-                          development_type = "hatch")
+rana_pip_mod <- fit_model(
+  temp = rana_pip_data$temp,
+  days = rana_pip_data$days,
+  species = "Rana_pipiens",
+  development_type = "hatch"
+)
 
-# Lithobates clamitans ----------------------------------------------------------
+# Lithobates clamitans --------------------------------------------------------
 # from Moore 1939
 
-rana_c_data <- tibble(temp = c(15,19.8, 25.3,33.4),
-                      hours = c(263,112,62,45)) |>
-  mutate(days = ceiling(hours/24))
+rana_c_data <- tibble(
+  temp = c(15, 19.8, 25.3, 33.4),
+  hours = c(263, 112, 62, 45)
+) |>
+  mutate(days = ceiling(hours / 24))
 
-rana_c_mod <- fit_model(temp = rana_c_data$temp,
-                        days = rana_c_data$days,
-                        species = "Lithobates_clamitans",
-                        development_type = "hatch")
+rana_c_mod <- fit_model(
+  temp = rana_c_data$temp,
+  days = rana_c_data$days,
+  species = "Lithobates_clamitans",
+  development_type = "hatch"
+)
 
 
 # Rana palustris ----------------------------------------------------------
 # from Moore 1939
 
-rana_p_data <- tibble(temp = c(15.5,18.6, 19.9, 25.7),
-                      hours = c(190,126,106,63)) |>
-  mutate(days = ceiling(hours/24))
+rana_p_data <- tibble(
+  temp = c(15.5, 18.6, 19.9, 25.7),
+  hours = c(190, 126, 106, 63)
+) |>
+  mutate(days = ceiling(hours / 24))
 
-rana_p_mod <- fit_model(temp = rana_p_data$temp,
-                        days = rana_p_data$days,
-                        species = "Rana_palustris",
-                        development_type = "hatch")
+rana_p_mod <- fit_model(
+  temp = rana_p_data$temp,
+  days = rana_p_data$days,
+  species = "Rana_palustris",
+  development_type = "hatch"
+)
 
-# Lithobates example --------------------------------------------------------------------
+# Lithobates example ----------------------------------------------------------
 
 ### Figure A Code
 # run for temp 16 C
 set.seed(123)
-temperature_data_cold <- data.frame(temperatures = sort(rnorm(30, mean = 16, sd =2.5)),
-                               dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days"))
+temperature_data_cold <- data.frame(
+  temperatures = sort(rnorm(30, mean = 16, sd = 2.5)),
+  dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days")
+)
 
-froggy_mods <- c(rana_s_mod$expression$expression,
-                 rana_p_mod$expression$expression,
-                 rana_c_mod$expression$expression,
-                 rana_pip_mod$expression$expression)
+froggy_mods <- c(
+  rana_s_mod$expression$expression,
+  rana_p_mod$expression$expression,
+  rana_c_mod$expression$expression,
+  rana_pip_mod$expression$expression
+)
 
 froggy_hatch_cold <- map(froggy_mods,
-                    predict_phenology,
-                    data = temperature_data_cold,
-                    dates = dates,
-                    temperature = temperatures,
-                    spawn.date = "2000-04-01") |>
-  map_dbl("days_to_develop") |> 
+  predict_phenology,
+  data = temperature_data_cold,
+  dates = dates,
+  temperature = temperatures,
+  spawn.date = "2000-04-01"
+) |>
+  map_dbl("days_to_develop") |>
   tibble()
-
-colnames(froggy_hatch_cold)[1] <- "days_to_develop"
-  
-froggy_hatch_cold <- froggy_hatch_cold |> 
-    mutate(species = c("Wood Frog", "Pickerel Frog", 
-                       "Green Frog","Northern Leopard Frog" )) |> 
-  arrange(desc(days_to_develop)) 
 
 colnames(froggy_hatch_cold)[1] <- "days_to_develop"
 
 froggy_hatch_cold <- froggy_hatch_cold |>
-  mutate(start = ymd("2000-04-01"),
-         stop = start + days_to_develop,
-         index = seq(20.5,17.5, by = -1))
+  mutate(species = c(
+    "Wood Frog", "Pickerel Frog",
+    "Green Frog", "Northern Leopard Frog"
+  )) |>
+  arrange(desc(days_to_develop))
+
+colnames(froggy_hatch_cold)[1] <- "days_to_develop"
+
+froggy_hatch_cold <- froggy_hatch_cold |>
+  mutate(
+    start = ymd("2000-04-01"),
+    stop = start + days_to_develop,
+    index = seq(20.5, 17.5, by = -1)
+  )
 
 
 
 p2.1.a <- ggplot() +
   geom_point(data = temperature_data_cold, aes(x = dates, y = temperatures)) +
   geom_line(data = temperature_data_cold, aes(x = dates, y = temperatures)) +
-  geom_rect(data = froggy_hatch_cold, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
-  geom_label(data = froggy_hatch_cold, aes(x = start + (stop - start) / 1.45, y = (index -0.325), label = days_to_develop)) +
+  geom_rect(data = froggy_hatch_cold, aes(xmin = start, xmax = stop, ymax = index - .15, ymin = index - .5, fill = species)) +
+  geom_label(data = froggy_hatch_cold, aes(x = start + (stop - start) / 1.45, y = (index - 0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
-  scale_fill_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
+  scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
   theme_classic() +
   theme(legend.position = c(0.75, 0.25))
 
 # run for temp 24 C
 set.seed(123)
-temperature_data_warm <- data.frame(temperatures = sort(rnorm(30, mean = 24, sd =2.5)),
-                                    dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days"))
+temperature_data_warm <- data.frame(
+  temperatures = sort(rnorm(30, mean = 24, sd = 2.5)),
+  dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days")
+)
 
 froggy_hatch_warm <- map(froggy_mods,
-                         predict_phenology,
-                         data = temperature_data_warm,
-                         dates = dates,
-                         temperature = temperatures,
-                         spawn.date = "2000-04-01") |>
-  map_dbl("days_to_develop") |> 
+  predict_phenology,
+  data = temperature_data_warm,
+  dates = dates,
+  temperature = temperatures,
+  spawn.date = "2000-04-01"
+) |>
+  map_dbl("days_to_develop") |>
   tibble()
 
 colnames(froggy_hatch_warm)[1] <- "days_to_develop"
 
-froggy_hatch_warm <- froggy_hatch_warm |> 
-  mutate(species = c("Wood Frog", "Pickerel Frog", 
-                     "Green Frog","Northern Leopard Frog" )) |> 
-  arrange(desc(days_to_develop)) 
+froggy_hatch_warm <- froggy_hatch_warm |>
+  mutate(species = c(
+    "Wood Frog", "Pickerel Frog",
+    "Green Frog", "Northern Leopard Frog"
+  )) |>
+  arrange(desc(days_to_develop))
 
 colnames(froggy_hatch_warm)[1] <- "days_to_develop"
 
 froggy_hatch_warm <- froggy_hatch_warm |>
-  mutate(start = ymd("2000-04-01"),
-         stop = start + days_to_develop,
-         index = seq(28.5,25.5, by = -1))
+  mutate(
+    start = ymd("2000-04-01"),
+    stop = start + days_to_develop,
+    index = seq(28.5, 25.5, by = -1)
+  )
 
 
 
 p2.1.b <- ggplot() +
   geom_point(data = temperature_data_warm, aes(x = dates, y = temperatures)) +
   geom_line(data = temperature_data_warm, aes(x = dates, y = temperatures)) +
-  geom_rect(data = froggy_hatch_warm, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
-  geom_label(data = froggy_hatch_warm, aes(x = start + (stop - start) / 1.45, y = (index -0.325), label = days_to_develop)) +
+  geom_rect(data = froggy_hatch_warm, aes(xmin = start, xmax = stop, ymax = index - .15, ymin = index - .5, fill = species)) +
+  geom_label(data = froggy_hatch_warm, aes(x = start + (stop - start) / 1.45, y = (index - 0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
-  scale_fill_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
+  scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
   theme_classic() +
   theme(legend.position = "none")
 
 ### Figure B code
 
 temps <- c(6:25)
-species = c("Wood Frog", "Pickerel Frog", 
-                       "Green Frog","Northern Leopard Frog" )
+species <- c(
+  "Wood Frog", "Pickerel Frog",
+  "Green Frog", "Northern Leopard Frog"
+)
 ef_vals <- NULL
 
-for( m in 1:length(froggy_mods)){
-  mod = froggy_mods[m]
-  frog = species[m]
+for (m in 1:length(froggy_mods)) {
+  mod <- froggy_mods[m]
+  frog <- species[m]
 
-for (x in temps) {
-  ef <- eval(parse(text = mod))
-  temp_df <- data.frame(temperature = x, 
-                        effective_value = ef, 
-                        frog_species = frog)
-  ef_vals <- rbind(ef_vals, temp_df)
-  
+  for (x in temps) {
+    ef <- eval(parse(text = mod))
+    temp_df <- data.frame(
+      temperature = x,
+      effective_value = ef,
+      frog_species = frog
+    )
+    ef_vals <- rbind(ef_vals, temp_df)
   }
 }
 
 data_2 <- tibble(temperature = c(0:25), effective_value = seq(0, 0.25, by = 0.01))
 
-p2.2 <- ef_vals |> tibble() |> 
+p2.2 <- ef_vals |>
+  tibble() |>
   ggplot(aes(x = temperature, y = effective_value, color = frog_species)) +
   geom_line() +
   geom_point() +
   geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
-  scale_color_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
+  scale_color_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
   theme_classic() +
   theme(legend.position = "none")
 
-(p2.1.a + p2.1.b) / p2.2 + plot_annotation(tag_levels = 'A')
+(p2.1.a + p2.1.b) / p2.2 + plot_annotation(tag_levels = "A")
 ```
 
-## Local Adaptation
+This example demonstrates how **hatchR** can be used to explore evolutionary and ecological differences in thermal sensitivity across species. When combined with phylogenetic or trait-based analyses, such reaction norms can reveal how developmental strategies align with species’ ecological niches, helping to explain the persistence of closely related species across thermal gradients.
 
-As was the case with the phylogenetic example, deveelopmental models may be parameterized for populations of the same species to better understand the effects of local adaptation. Here, we take data from a common garden experiment with Chinese cabbage beetles distributed across of a latitudinal cline of 3,440 kilometers [@tang2017]. The beetles were raised at six temperatures ranging from 16 to 28 C° and while development rates for females were very similar for populations from northern latitudes, populations from the south developed faster, consistent with the cogradient variation (local adaptation) where the genetic and environmental effects on phenotypes are additive [@conover2009, @sparks2022]. We further demonstrated this phenomena by fitting custom developmental models for each population (Longnan was removed because values were the same as Xiushui), showing rank order changes in developmental rates at colder temperatures, indicating cogradient phenotypes may only be expressed in a subset of temperatures (Figure 4).
+## Local Adaptation: Cogradient Variation in Developmental Rates
 
-```{r, fig.height= 5 , fig.width= 5, fig.align = 'center', fig.cap="Effective value models developed for five populations of cabbage beetle (females) along a latitudinal cline in China from Tang et al. 2017. Note the large difference in developmental rate between Xiushui County and the other, more notherly populations, which is indicative of cogradient variation."}
-tang_temps <- c(16,19,22,24,26,28) 
+As with interspecific comparisons, developmental models can be parameterized at the population level to examine local adaptation within species. In particular, hatchR allows researchers to compare how different populations respond to temperature, helping to reveal evolved differences in thermal sensitivity across environmental gradients.
+
+Here, we used data from a common garden experiment on cabbage beetles (Colaphellus bowringi) reared at six constant temperatures (16–28 °C), spanning populations collected along a ~3,440 km latitudinal gradient in China [@tang2017]. Although all beetles were reared under identical conditions, developmental rates differed among populations, particularly at cooler temperatures. Populations from southern latitudes—where temperatures are generally warmer—developed more quickly than northern populations, a pattern consistent with cogradient variation, where genetic and environmental effects on a phenotype act in the same direction [@conover2009; @sparks2022].
+
+To visualize these patterns, we fit custom effective value models for five of the six populations (excluding Longnan, which duplicated the values from Xiushui). The resulting linearized effective value curves (Figure \@ref(fig:beetles)) show that beetles from Xiushui County (southernmost) had consistently faster development rates across temperatures than their more northerly counterparts. These differences are especially pronounced at cooler temperatures, suggesting that local adaptation may only manifest under certain environmental conditions.
+
+```{r beetles, fig.height=3 , fig.width=5, fig.align='center', fig.cap="Effective value models for five populations of cabbage beetles (Colaphellus bowringi, females) along a latitudinal gradient in China [@tang2017]. Models were parameterized from common garden experiments under constant temperatures. The southernmost population (Xiushui County) shows a consistently faster developmental rate than populations from more northerly sites, especially at colder temperatures. This pattern is indicative of cogradient variation, where both genetic and environmental effects reinforce the observed phenotypic trend."}
+tang_temps <- c(16, 19, 22, 24, 26, 28)
 
 
 hb <- c(24.834, 19.481, 14.172, 11.205, 9.865, 8.570)
 
-sy <- c( 23.822, 19.129, 13.644, 10.897, 9.645, 8.306)
+sy <- c(23.822, 19.129, 13.644, 10.897, 9.645, 8.306)
 
-ta <- c( 21.887, 18.381, 12.984, 10.809, 9.382, 8.130)
+ta <- c(21.887, 18.381, 12.984, 10.809, 9.382, 8.130)
 
-xy <- c( 21.623, 18.337, 12.589, 10.633, 9.205, 8.085 )
+xy <- c(21.623, 18.337, 12.589, 10.633, 9.205, 8.085)
 
-xs <- c( 21.271, 16.666, 11.797, 9.929, 9.117, 6.942)
+xs <- c(21.271, 16.666, 11.797, 9.929, 9.117, 6.942)
 
 pop_list <- list(hb, sy, ta, xy, xs)
 
-beetle_mods <- pop_list |> map(fit_model,
-                temp = tang_temps,
-                species = "cabbage beetle",
-                development_type = "hatch") |> 
-  map("expression") |> 
-  map("expression") |> 
+beetle_mods <- pop_list |>
+  map(fit_model,
+    temp = tang_temps,
+    species = "cabbage beetle",
+    development_type = "hatch"
+  ) |>
+  map("expression") |>
+  map("expression") |>
   unlist()
 
 temps <- c(12:30)
-pops = c("Haerbin City", 
-         "Shenyang City", 
-         "Taian City",
-         "Xinyang County",
-         "Xiushui County")
+pops <- c(
+  "Haerbin City",
+  "Shenyang City",
+  "Taian City",
+  "Xinyang County",
+  "Xiushui County"
+)
 
 ef_vals_pops <- NULL
 
-for( m in 1:length(beetle_mods)){
-  mod = beetle_mods[m]
-  pop = pops[m]
+for (m in 1:length(beetle_mods)) {
+  mod <- beetle_mods[m]
+  pop <- pops[m]
 
-for (x in temps) {
-  ef <- eval(parse(text = mod))
-  temp_df <- data.frame(temperature = x, 
-                        effective_value = ef, 
-                        beetle_pops = pop)
-  ef_vals_pops <- rbind(ef_vals_pops, temp_df)
-  
+  for (x in temps) {
+    ef <- eval(parse(text = mod))
+    temp_df <- data.frame(
+      temperature = x,
+      effective_value = ef,
+      beetle_pops = pop
+    )
+    ef_vals_pops <- rbind(ef_vals_pops, temp_df)
   }
 }
 
-ef_vals_pops |> tibble() |> 
+ef_vals_pops |>
+  tibble() |>
   ggplot(aes(x = temperature, y = effective_value, color = beetle_pops)) +
   geom_line() +
   geom_point() +
-  #geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
+  # geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   scale_color_brewer(palette = "Dark2", name = "Beetle Populations") +
   theme_classic() +
   theme(legend.position = c(0.25, 0.75))
 ```
 
+This example illustrates how **hatchR** can be used to explore the intersection of developmental plasticity and local adaptation using real-world data. Such applications are useful for disentangling the genetic basis of thermal sensitivity, anticipating geographic responses to climate change, and informing population-specific management strategies.
+
 # Discussion
 
-hatchR, while originally designed specific to fishes, is a generalizeable tool to predict phenology for any wild poikilotherm. Power law models can either be fit using the `fit_model()` function in the package are users can build custom models and pass their expressions to `predict_phenology()` in the hatchR workflow. hatchR also offers a graphical-user-interface which allows users to interact with the software without needing programmatic aptitude. With this manuscript we demonstrate numerous putative sources of parameterization for species spanning four taxonomic Classes and provide additional resources for many more species. We also present three specific case studies to demonstrate the wide breadth of questions that may be answered with parameterized effective value models.
+Although originally developed for fishes, **hatchR** is a generalizeable and flexible tool for predicting phenology across a broad diversity of poikilothermic organisms. The effective value framework accommodates nonlinear thermal sensitivity and allows researchers to estimate the timing of developmental milestones under realistic, fluctuating temperature regimes. In this manuscript, we demonstrate how power-law models can be fit using the `fit_model()` function, or defined externally and passed into the `predict_phenology()` function. For users without coding experience, a graphical user interface is also available via the **hatchR** Shiny app, expanding accessibility and encouraging broader adoption across disciplines.
 
-As with fishes, it is important to recognize other environmental cues may impact when organisms hatch or achieve other developmental milestones. In particular, predator cues...BRIAN ADD HERE. Talk also about physical cues like salinity or metals etc.
+We highlight the extensibility of **hatchR** through a compilation of parameterizable species across four taxonomic classes and through three case studies that illustrate ecological, evolutionary, and conservation applications. These case studies span field data, phylogenetic comparisons, and experimental designs, demonstrating the tool’s flexibility across data types and biological questions.
 
-Additionally, we encourage users to be especially cognizant of how models are parameterized (discussed at greater lenght in **hatch paper 1**). Specifically, when parameterizing models we recommend using a minimum of four temperature treatments with temperatures as disparate as reasonable. We similarly caution users to not heavily interpolate past the fits of their models. In the process of investigating potential sources for species parameterizations, we found many studies that only used two experimental temperatures to test developmental rates (*e.g.*, [@qualls1998, @kozák2009]. We explicitly recommend against using such data to parameterize these models because two treatments will result in a model that misses the non-linearity inherent to these relationships.
+As with any model of developmental timing, it is important to recognize that temperature is not the sole determinant of phenological events. Other environmental cues—such as photoperiod, substrate quality, hydrology, salinity, or exposure to contaminants (e.g., metals or endocrine-disrupting chemicals)—can modulate developmental rates or induce thresholds not captured in thermal response curves (NEED REF). Biotic cues may also play a role; for example, the presence of predators can delay hatching in some amphibians as an adaptive strategy [e.g., @sih2004]. While **hatchR** focuses specifically on temperature-dependent development, it can be integrated with complementary datasets or experimental manipulations to investigate these more complex, context-dependent interactions.
 
-Given the broad applicability of this tool for wide range of species, we particularly highlight quick developing species such as the frogs presented in the phylogenetic case study. With all species, multiple treatments could reasonably be conducted in a month's time and could be used for a variety of questions or applications. For example, one could parameterize developmental models for a variety of populations of one species to investigate local adaptation and the response of populations to changing temperatures. Alternatively, models could be developed with Daphnia or insects in classrooms to introduce reaction norm concepts. Similar to bioenergetic models, if all individuals are assumed to be receiving the same energy input (*e.g.*, fed *ad libitum,*) models could potentially be extended for additional phenological events once individuals begin exogenous feeding [@lillehammer1986].
+We also encourage users to carefully consider how models are parameterized. As discussed in greater detail in Sparks et al. (2025), we recommend using experimental data with at least four distinct temperature treatments spanning a wide thermal range. This is critical for capturing the nonlinear shape of developmental rate curves and avoiding overfitting or extrapolation errors. Many studies we encountered—particularly older or gray literature—relied on only two temperature treatments (e.g., [@qualls1998; @kozák2009]), which we do not recommend for model fitting due to the inability to detect curvature.
 
-**...Outline Summary for Above...**
-
-P1: Summary of above
-
-P2: Caveats
-
--   namely that some taxa like insects and frogs are much more likely to bail on development when environmental cues suggest they need to
--   more studies need to include more than 2 temperatures @qualls1998 @kozák2009
-
-P3: Other considerations?
-
--   easy to parameterize custom models for quick developing species
--   examples where other stages could be modeled assuming constant feeding [@lillehammer1986]
-
-P4: ???
+Given the wide potential applicability of **hatchR**, we especially emphasize its utility for rapidly developing species. For example, as shown in our phylogenetic case study, frog species with short incubation periods can be reared across multiple treatments in a single month, making them ideal for both research and teaching applications. Researchers can use these models to investigate thermal adaptation, phenological mismatch, or range-wide trait variation. In educational settings, developmental models could be built for *Daphnia*, insects, or amphibians to introduce students to reaction norms, thermal performance, and evolutionary trade-offs. Moreover, while **hatchR** currently focuses on pre-feeding stages, the effective value approach could potentially be extended to post-hatch phenological events—particularly when energy input is standardized (e.g., individuals reared under *ad libitum* conditions) [@lillehammer1986].
 
 # Conclusion
 
-Despite being designed for fishes, hatchR is a generalizeable and simple tool for predicting developmental phenology across a wide array of poikilothermic organisms. Furthermore, the tools overcomes many of the limitations of other developmental models used for these species. Tools such as hatchR will be particularly useful for interrogating species and population responses to quickening changes to their thermal environments. While we provide numerous putative sources for parameterization and a handful of case studies, we expect the applications of hatchR far extend beyond what we envision here.
+Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of climate change. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
 
 # Bibliography
