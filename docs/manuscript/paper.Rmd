@@ -234,7 +234,7 @@ reptiles |>
 
 ## Ecological
 
-Recreate @karraker2006 with data from @siegel2023
+To demonstrate an ecological application for hatchR, we used estimates for oviposition timing for *A. truei* from @karraker2006 (unpublished data). Using the parameterized coastal tailed frog model presented above (Figure 1) and assumed a fixed oviposition date based on the estimates from @karraker2006 we predicted days to hatch for populations in Washington and Oregon, where long-term temporal predictions of stream temperature were available [@siegel2023] at the COMID level. Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with average days to hatch taking more than twice as long in Olympic National Park as in the Willapa Hills (32 days compared to 15 days). When broken down by site, there was a weak but significant relationship between year and days to hatch (Supplemental Data), with slight negative trend over the thirty year period, indicating temperatures at the sites were warming (Figure 2). Over the 30-year period, the site with the quickest average developmental period was in the Willapa Hills (15 days) and the site with the longest average developmental period was in Olympic National Park (44 days). Finally, the standard deviation at Willapa Hills, Siskiyou Mountains, and Cascade Mountains was much lower (\<3) than that of the Olympic National Park sites (11.0) indicating much less sensitivity to temperature change over the 30-years.
 
 ```{r, eval=FALSE}
 ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
@@ -297,16 +297,23 @@ ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> dro
 
 #karraker_data <- readxl::read_xls("../../data/ASMO_ASTR_egg_data.xls")
 
-spawn_dates <- map(
-  c(1991:2020), # year vector to map for custom function
-  function(year) { # custom function to make dates
-      paste0(year, "-07-24")
-    }
-  ) |> 
-  unlist()
+
 
 pred_hatch = NULL
 for(sites in unique(ascaphus_siegel_data$COMID)) {
+  
+  ascaphus_site <- ascaphus_sites |> filter(comid == sites)
+  
+  month <- month(ascaphus_site$oviposition_date)
+  mday <- mday(ascaphus_site$oviposition_date)
+  
+  spawn_dates <- map(
+  c(1991:2020), # year vector to map for custom function
+  function(year) { # custom function to make dates
+      paste0(year,"-", month, "-", mday)
+    }
+  ) |> 
+  unlist()
   
   site <-  ascaphus_siegel_data |> filter( COMID == sites) |> drop_na(prd.stream_temp)
   
@@ -318,27 +325,28 @@ for(sites in unique(ascaphus_siegel_data$COMID)) {
               temperature = prd.stream_temp,
               dates = date,
               model = ascaphus_mod$expression$expression) |> 
-    map_dbl("days_to_develop")
+    map_df("dev_period") |> 
+    mutate(days = stop -start)
   
-  temp_df <- data.frame(days = hatch,
+  temp_df <- data.frame(days = hatch$days,
                         comid = rep(sites, times =length(hatch)),
                         year = year(spawn_dates))
   
   pred_hatch <- rbind(pred_hatch, temp_df)
 }
 
-pred_hatch <- pred_hatch |> 
-  left_join(ascaphus_sites |> group_by(comid) |> slice_head( n =1), by = join_by(comid == comid))
+model_data <- pred_hatch |> 
+  left_join(ascaphus_sites |> group_by(comid) |> slice_head( n =1), by = join_by(comid == comid)) |> 
+  mutate(days = as.integer(days),
+         comid = as.factor(comid))
 
-# pred_hatch |> 
-#   mutate(comid = as.factor(comid)) |> 
+# model_data |>
 #   ggplot() +
-#   geom_density_ridges(aes(y = year, x = days + ymd("2001-07-14"), fill = comid)) +
+#   geom_density_ridges(aes(y = as.factor(year), x = days , fill = Mountain)) +
 #   theme_classic() +
 #   theme(legend.position = "none")
 # 
-# pred_hatch |> 
-#   mutate(comid = as.factor(comid)) |> 
+# model_data |>
 #   ggplot(aes(x = year, y = days , color= Mountain, group = comid)) +
 #   geom_point() +
 #   #geom_line() +
@@ -347,23 +355,57 @@ pred_hatch <- pred_hatch |>
 #   theme_classic() +
 #   theme(legend.position = c(0.8, 0.75))
 
-mod <- lm(days ~ year*Mountain, data = pred_hatch)
-# sjPlot::tab_model(mod)
+mod <- lm(days ~ year*as.factor(comid) + Mountain, data = model_data)
 
-estimate_means(mod, c("year", "Mountain")) |> 
-  plot() +
-  #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
+means <- estimate_means(mod, c("year", "comid")) |>  tibble()
+
+means  |> 
+  mutate(comid = as.integer(as.character(comid))) |> 
+  left_join(ascaphus_sites, by = join_by(comid == comid)) |> 
+  ggplot(aes(x = year,
+             y = Mean,
+                  ymin= CI_low, 
+                  ymax = CI_high,
+                  group = comid,
+                  fill = Mountain,
+             color = Mountain)) +
+  geom_line(size = 1.1) +
+  geom_ribbon(alpha = 0.05, color = NA) +
   labs(x = "Year", y = "Mean of Days to Hatch") +
   theme_classic()
+
+# estimate_means(mod, c("year", "comid")) |> 
+#   plot() +
+#   #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
+#   labs(x = "Year", y = "Mean of Days to Hatch") +
+#   theme_classic()
+```
+
+```{r, eval=FALSE}
+
+model_data |> 
+  drop_na(days) |>  
+  group_by(Mountain) |> 
+  summarise(mean_hatch = round(mean(days), 1),
+            sd_hatch =sd(days))
+
+model_data |> 
+  drop_na(days) |>  
+  group_by(Mountain, comid) |> 
+  summarise(mean_hatch = round(mean(days), 1))
+
+sjPlot::tab_model(mod)
 ```
 
 ## Phylogenetic
 
-Frog example Moore 1939.
+As species diverge from one another it is expected that phenotypes respond to different niche space which is part of that divergence. To assess those differences,one can execyte experiments that test phenotypic divergence (common garden or reciprocal transplant) and display phenotypic data as reaction norms, showing the relative genetic and environmental contribution to phenotypes. hatchR is a unique tool for demonstrating these differences because the strong fits of developmental rates, either displayed as model fits or the linearized effective value model lines are forms of reaction norms, even if species did not experience the same developmental conditions. While not as precise as using controlled experiments, hatchR derived reaction norms can be used to demonstrate how genetic x environment interactions vary among species and how those phenotypes may fit the niche spaces occupied by phylogenetically close or divergent species.
 
-Pic labels are wrong, check
+To demonstrate this approach, we leverage custom time to hatch parameterizations for four *Lithobates* frog species developed by @moore1939. We show large differences in developmental rates for common North American frogs which often overlap in their ranges—green frog, *L. clamitans*; northern leopard frog, *L. pipiens*; pickerel frog, *L. palustris*; and wood frog, *L. sylvaticus*. Specifically, when developmental models were fit to a randomly generated temperature regime of 16 and 24 C°, the species-specific effects of devlopment are clear. Whereas at warm temperatures, all species hatch the same day or within one day of one another, at cold temperatures, wood frogs develop the quickest and green frogs the slowest (twice the rate of wood frogs).
 
-```{r, fig.height= 8 , fig.width= 6, fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C (Panel A). Panel B shows the effective values for different mean daily temperatures for each species, which are effectively species-specific linearized developmental reaction norms."}
+BRIAN ADD SOMETHING ABOUT THEIR ECOLOGY ABOVE TO FIT THIS INTO BROADER CONTEXT.
+
+```{r, fig.height= 8 , fig.width= 8, fig.align = 'center', fig.cap="Custom hatch timing models developed for four North American frog species. Models are parameterized from Moore 1939 and phenology is predicted using a randomly generated temperature regime with mean 16 °C (Panel A) and mean 24 °C (Panel B). Panel C shows the effective values for different mean daily temperatures for each species, which are effectively species-specific linearized developmental reaction norms. Note the genetic x environment interactions in Panel C as temperatures warm and shown by the rank order change in species in Panel A compared with Panel B."}
 
 ### all the Rana's below refer to taxonomy from the paper, they are now genus Lithobates
 
@@ -425,8 +467,9 @@ rana_p_mod <- fit_model(temp = rana_p_data$temp,
 # Lithobates example --------------------------------------------------------------------
 
 ### Figure A Code
+# run for temp 16 C
 set.seed(123)
-temperature_data <- data.frame(temperatures = sort(rnorm(30, mean = 16, sd =2.5)),
+temperature_data_cold <- data.frame(temperatures = sort(rnorm(30, mean = 16, sd =2.5)),
                                dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days"))
 
 froggy_mods <- c(rana_s_mod$expression$expression,
@@ -434,44 +477,84 @@ froggy_mods <- c(rana_s_mod$expression$expression,
                  rana_c_mod$expression$expression,
                  rana_pip_mod$expression$expression)
 
-froggy_hatch <- map(froggy_mods,
+froggy_hatch_cold <- map(froggy_mods,
                     predict_phenology,
-                    data = temperature_data,
+                    data = temperature_data_cold,
                     dates = dates,
                     temperature = temperatures,
                     spawn.date = "2000-04-01") |>
   map_dbl("days_to_develop") |> 
   tibble()
 
-colnames(froggy_hatch)[1] <- "days_to_develop"
+colnames(froggy_hatch_cold)[1] <- "days_to_develop"
   
-froggy_hatch <- froggy_hatch |> 
+froggy_hatch_cold <- froggy_hatch_cold |> 
     mutate(species = c("Wood Frog", "Pickerel Frog", 
                        "Green Frog","Northern Leopard Frog" )) |> 
   arrange(desc(days_to_develop)) 
 
-colnames(froggy_hatch)[1] <- "days_to_develop"
+colnames(froggy_hatch_cold)[1] <- "days_to_develop"
 
-froggy_hatch <- froggy_hatch |>
+froggy_hatch_cold <- froggy_hatch_cold |>
   mutate(start = ymd("2000-04-01"),
          stop = start + days_to_develop,
          index = seq(20.5,17.5, by = -1))
 
 
 
-p2.1 <- ggplot() +
-  geom_point(data = temperature_data, aes(x = dates, y = temperatures)) +
-  geom_line(data = temperature_data, aes(x = dates, y = temperatures)) +
-  geom_rect(data = froggy_hatch, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
-  geom_label(data = froggy_hatch, aes(x = start + (stop - start) / 1.45, y = (index -0.325), label = days_to_develop)) +
+p2.1.a <- ggplot() +
+  geom_point(data = temperature_data_cold, aes(x = dates, y = temperatures)) +
+  geom_line(data = temperature_data_cold, aes(x = dates, y = temperatures)) +
+  geom_rect(data = froggy_hatch_cold, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
+  geom_label(data = froggy_hatch_cold, aes(x = start + (stop - start) / 1.45, y = (index -0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
   theme_classic() +
   theme(legend.position = c(0.75, 0.25))
 
+# run for temp 24 C
+set.seed(123)
+temperature_data_warm <- data.frame(temperatures = sort(rnorm(30, mean = 24, sd =2.5)),
+                                    dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days"))
+
+froggy_hatch_warm <- map(froggy_mods,
+                         predict_phenology,
+                         data = temperature_data_warm,
+                         dates = dates,
+                         temperature = temperatures,
+                         spawn.date = "2000-04-01") |>
+  map_dbl("days_to_develop") |> 
+  tibble()
+
+colnames(froggy_hatch_warm)[1] <- "days_to_develop"
+
+froggy_hatch_warm <- froggy_hatch_warm |> 
+  mutate(species = c("Wood Frog", "Pickerel Frog", 
+                     "Green Frog","Northern Leopard Frog" )) |> 
+  arrange(desc(days_to_develop)) 
+
+colnames(froggy_hatch_warm)[1] <- "days_to_develop"
+
+froggy_hatch_warm <- froggy_hatch_warm |>
+  mutate(start = ymd("2000-04-01"),
+         stop = start + days_to_develop,
+         index = seq(28.5,25.5, by = -1))
+
+
+
+p2.1.b <- ggplot() +
+  geom_point(data = temperature_data_warm, aes(x = dates, y = temperatures)) +
+  geom_line(data = temperature_data_warm, aes(x = dates, y = temperatures)) +
+  geom_rect(data = froggy_hatch_warm, aes(xmin = start, xmax = stop, ymax =index-.15, ymin = index-.5, fill = species)) +
+  geom_label(data = froggy_hatch_warm, aes(x = start + (stop - start) / 1.45, y = (index -0.325), label = days_to_develop)) +
+  labs(x = "Date", y = "Temperature (°C)") +
+  scale_fill_manual(values = c("darkolivegreen4","deepskyblue4", "grey23",  "purple4"), name = "Species") +
+  theme_classic() +
+  theme(legend.position = "none")
+
 ### Figure B code
 
-temps <- c(6:20)
+temps <- c(6:25)
 species = c("Wood Frog", "Pickerel Frog", 
                        "Green Frog","Northern Leopard Frog" )
 ef_vals <- NULL
@@ -490,7 +573,7 @@ for (x in temps) {
   }
 }
 
-data_2 <- tibble(temperature = c(0:20), effective_value = seq(0, 0.20, by = 0.01))
+data_2 <- tibble(temperature = c(0:25), effective_value = seq(0, 0.25, by = 0.01))
 
 p2.2 <- ef_vals |> tibble() |> 
   ggplot(aes(x = temperature, y = effective_value, color = frog_species)) +
@@ -502,16 +585,12 @@ p2.2 <- ef_vals |> tibble() |>
   theme_classic() +
   theme(legend.position = "none")
 
-p2.1 / p2.2 + plot_annotation(tag_levels = 'A')
+(p2.1.a + p2.1.b) / p2.2 + plot_annotation(tag_levels = 'A')
 ```
 
 ## Local Adaptation
 
-Need an example where multiple populations from the same species are parameterized. ideally not an amphibian
-
-@tang2017 example using females
-
-Evidence for cogradient clinal adaptation where the farthest south population develops the fastest.
+As was the case with the phylogenetic example, deveelopmental models may be parameterized for populations of the same species to better understand the effects of local adaptation. Here, we take data from a common garden experiment with Chinese cabbage beetles distributed across of a latitudinal cline of 3,440 kilometers [@tang2017]. The beetles were raised at six temperatures ranging from 16 to 28 C° and while development rates for females were very similar for populations from northern latitudes, populations from the south developed faster, consistent with the cogradient variation (local adaptation) where the genetic and environmental effects on phenotypes are additive [@conover2009, @sparks2022]. We further demonstrated this phenomena by fitting custom developmental models for each population (Longnan was removed because values were the same as Xiushui), showing rank order changes in developmental rates at colder temperatures, indicating cogradient phenotypes may only be expressed in a subset of temperatures (Figure 4).
 
 ```{r, fig.height= 5 , fig.width= 5, fig.align = 'center', fig.cap="Effective value models developed for five populations of cabbage beetle (females) along a latitudinal cline in China from Tang et al. 2017. Note the large difference in developmental rate between Xiushui County and the other, more notherly populations, which is indicative of cogradient variation."}
 tang_temps <- c(16,19,22,24,26,28) 
