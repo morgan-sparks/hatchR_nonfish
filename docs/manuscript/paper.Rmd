@@ -805,32 +805,25 @@ This example illustrates how **hatchR** can be used to explore the intersection 
 
 # Discussion
 
-hatchR, while originally designed specific to fishes, is a generalizeable tool to predict phenology for any wild poikilotherm. Power law models can either be fit using the `fit_model()` function in the package are users can build custom models and pass their expressions to `predict_phenology()` in the hatchR workflow. hatchR also offers a graphical-user-interface which allows users to interact with the software without needing programmatic aptitude. With this manuscript we demonstrate numerous putative sources of parameterization for species spanning four taxonomic Classes and provide additional resources for many more species. We also present three specific case studies to demonstrate the wide breadth of questions that may be answered with parameterized effective value models.
+Although originally developed for fishes, **hatchR** is a generalizeable and flexible tool for predicting phenology across a broad diversity of poikilothermic organisms. The effective value framework accommodates nonlinear thermal sensitivity and allows researchers to estimate the timing of developmental milestones under realistic, fluctuating temperature regimes. In this manuscript, we demonstrate how power-law models can be fit using the `fit_model()` function, or defined externally and passed into the `predict_phenology()` function. For users without coding experience, a graphical user interface is also available via the **hatchR** Shiny app, expanding accessibility and encouraging broader adoption across disciplines.
 
-As with fishes, it is important to recognize other environmental cues may impact when organisms hatch or achieve other developmental milestones. In particular, predator cues...BRIAN ADD HERE. Talk also about physical cues like salinity or metals etc.
+We highlight the extensibility of **hatchR** through a compilation of parameterizable species across four taxonomic classes and through three case studies that illustrate ecological, evolutionary, and conservation applications. These case studies span field data, phylogenetic comparisons, and experimental designs, demonstrating the tool’s flexibility across data types and biological questions.
 
-Additionally, we encourage users to be especially cognizant of how models are parameterized (discussed at greater lenght in **hatch paper 1**). Specifically, when parameterizing models we recommend using a minimum of four temperature treatments with temperatures as disparate as reasonable. We similarly caution users to not heavily interpolate past the fits of their models. In the process of investigating potential sources for species parameterizations, we found many studies that only used two experimental temperatures to test developmental rates (*e.g.*, [@qualls1998, @kozák2009]. We explicitly recommend against using such data to parameterize these models because two treatments will result in a model that misses the non-linearity inherent to these relationships.
+As with any model of developmental timing, it is important to recognize that temperature is not the sole determinant of phenological events. Other environmental cues—such as photoperiod, substrate quality, hydrology, salinity, or exposure to contaminants (e.g., metals or endocrine-disrupting chemicals)—can modulate developmental rates or induce thresholds not captured in thermal response curves (NEED REF). Biotic cues may also play a role; for example, the presence of predators can delay hatching in some amphibians as an adaptive strategy [e.g., @sih2001]. While **hatchR** focuses specifically on temperature-dependent development, it can be integrated with complementary datasets or experimental manipulations to investigate these more complex, context-dependent interactions.
 
-Given the broad applicability of this tool for wide range of species, we particularly highlight quick developing species such as the frogs presented in the phylogenetic case study. With all species, multiple treatments could reasonably be conducted in a month's time and could be used for a variety of questions or applications. For example, one could parameterize developmental models for a variety of populations of one species to investigate local adaptation and the response of populations to changing temperatures. Alternatively, models could be developed with Daphnia or insects in classrooms to introduce reaction norm concepts. Similar to bioenergetic models, if all individuals are assumed to be receiving the same energy input (*e.g.*, fed *ad libitum,*) models could potentially be extended for additional phenological events once individuals begin exogenous feeding [@lillehammer1986].
+Sih, A., Bell, A. M., & Kerby, J. L. (2004). Two stressors are far deadlier than one. Trends in Ecology & Evolution, 19(6), 274–276.
 
-**...Outline Summary for Above...**
+We also encourage users to carefully consider how models are parameterized. As discussed in greater detail in Sparks et al. (2025), we recommend using experimental data with at least four distinct temperature treatments spanning a wide thermal range. This is critical for capturing the nonlinear shape of developmental rate curves and avoiding overfitting or extrapolation errors. Many studies we encountered—particularly older or gray literature—relied on only two temperature treatments (e.g., [@qualls1998; @kozák2009]), which we do not recommend for model fitting due to the inability to detect curvature.
 
-P1: Summary of above
-
-P2: Caveats
-
--   namely that some taxa like insects and frogs are much more likely to bail on development when environmental cues suggest they need to
--   more studies need to include more than 2 temperatures @qualls1998 @kozák2009
-
-P3: Other considerations?
-
--   easy to parameterize custom models for quick developing species
--   examples where other stages could be modeled assuming constant feeding [@lillehammer1986]
-
-P4: ???
+Given the wide potential applicability of **hatchR**, we especially emphasize its utility for rapidly developing species. For example, as shown in our phylogenetic case study, frog species with short incubation periods can be reared across multiple treatments in a single month, making them ideal for both research and teaching applications. Researchers can use these models to investigate thermal adaptation, phenological mismatch, or range-wide trait variation. In educational settings, developmental models could be built for *Daphnia*, insects, or amphibians to introduce students to reaction norms, thermal performance, and evolutionary trade-offs. Moreover, while **hatchR** currently focuses on pre-feeding stages, the effective value approach could potentially be extended to post-hatch phenological events—particularly when energy input is standardized (e.g., individuals reared under *ad libitum* conditions) [@lillehammer1986].
 
 # Conclusion
 
 Despite being designed for fishes, hatchR is a generalizeable and simple tool for predicting developmental phenology across a wide array of poikilothermic organisms. Furthermore, the tools overcomes many of the limitations of other developmental models used for these species. Tools such as hatchR will be particularly useful for interrogating species and population responses to quickening changes to their thermal environments. While we provide numerous putative sources for parameterization and a handful of case studies, we expect the applications of hatchR far extend beyond what we envision here.
+
+**BMM-Version:**
+
+Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of climate change. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
+
 
 # Bibliography
