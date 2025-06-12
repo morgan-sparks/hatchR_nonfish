@@ -234,7 +234,7 @@ reptiles |>
 
 ## Ecological
 
-To demonstrate an ecological application for hatchR, we used estimates for oviposition timing for *A. truei* from @karraker2006 (unpublished data). Using the parameterized coastal tailed frog model presented above (Figure 1) and assumed a fixed oviposition date based on the estimates from @karraker2006 we predicted days to hatch for populations in Washington and Oregon, where long-term temporal predictions of stream temperature were available [@siegel2023] at the COMID level. Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with average days to hatch taking more than twice as long in Olympic National Park as in the Willapa Hills (32 days compared to 15 days). When broken down by site, there was a weak but significant relationship between year and days to hatch (Supplemental Data), with slight negative trend over the thirty year period, indicating temperatures at the sites were warming (Figure 2). Over the 30-year period, the site with the quickest average developmental period was in the Willapa Hills (15 days) and the site with the longest average developmental period was in Olympic National Park (44 days). Finally, the standard deviation at Willapa Hills, Siskiyou Mountains, and Cascade Mountains was much lower (\<3) than that of the Olympic National Park sites (11.0) indicating much less sensitivity to temperature change over the 30-years.
+To demonstrate an ecological application for hatchR, we used estimates for oviposition timing for *A. truei* from @karraker2006 (unpublished data). Using the parameterized coastal tailed frog model presented above (Figure 1) and assumed a fixed oviposition date based on the estimates from @karraker2006 we predicted days to hatch for populations in Washington and Oregon, where long-term temporal predictions of stream temperature were available [@siegel2023] at the COMID level. Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with average days to hatch taking more than twice as long in Olympic National Park as in the Willapa Hills (32 days compared to 15 days). When broken down by site, there was a weak but significant relationship between year and days to hatch (Supplemental Data), with slight negative trend over the thirty year period, indicating temperatures at the sites were warming (Figure 2). Over the 30-year period, the site with the quickest average developmental period was in the Willapa Hills (15 days) and the site with the longest average developmental period was in Olympic National Park (44 days). Finally, the standard deviation at Willapa Hills, Siskiyou Mountains, and Cascade Mountains was much lower (\<3) than that of the Olympic National Park sites (11.0) indicating much greater sensitivity to temperature change over the past 30-years in the park.
 
 ```{r, eval=FALSE}
 ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
@@ -652,6 +652,16 @@ ef_vals_pops |> tibble() |>
 
 # Discussion
 
+hatchR, while originally designed specific to fishes, is a generalizeable tool to predict phenology for any wild poikilotherm. Power law models can either be fit using the `fit_model()` function in the package are users can build custom models and pass their expressions to `predict_phenology()` in the hatchR workflow. hatchR also offers a graphical-user-interface which allows users to interact with the software without needing programmatic aptitude. With this manuscript we demonstrate numerous putative sources of parameterization for species spanning four taxonomic Classes and provide additional resources for many more species. We also present three specific case studies to demonstrate the wide breadth of questions that may be answered with parameterized effective value models.
+
+As with fishes, it is important to recognize other environmental cues may impact when organisms hatch or achieve other developmental milestones. In particular, predator cues...BRIAN ADD HERE. Talk also about physical cues like salinity or metals etc.
+
+Additionally, we encourage users to be especially cognizant of how models are parameterized (discussed at greater lenght in **hatch paper 1**). Specifically, when parameterizing models we recommend using a minimum of four temperature treatments with temperatures as disparate as reasonable. We similarly caution users to not heavily interpolate past the fits of their models. In the process of investigating potential sources for species parameterizations, we found many studies that only used two experimental temperatures to test developmental rates (*e.g.*, [@qualls1998, @kozák2009]. We explicitly recommend against using such data to parameterize these models because two treatments will result in a model that misses the non-linearity inherent to these relationships.
+
+Given the broad applicability of this tool for wide range of species, we particularly highlight quick developing species such as the frogs presented in the phylogenetic case study. With all species, multiple treatments could reasonably be conducted in a month's time and could be used for a variety of questions or applications. For example, one could parameterize developmental models for a variety of populations of one species to investigate local adaptation and the response of populations to changing temperatures. Alternatively, models could be developed with Daphnia or insects in classrooms to introduce reaction norm concepts. Similar to bioenergetic models, if all individuals are assumed to be receiving the same energy input (*e.g.*, fed *ad libitum,*) models could potentially be extended for additional phenological events once individuals begin exogenous feeding [@lillehammer1986].
+
+**...Outline Summary for Above...**
+
 P1: Summary of above
 
 P2: Caveats
@@ -666,8 +676,8 @@ P3: Other considerations?
 
 P4: ???
 
-### Conclusion
+# Conclusion
 
-Isn't this a great tool with so many applications!?
+Despite being designed for fishes, hatchR is a generalizeable and simple tool for predicting developmental phenology across a wide array of poikilothermic organisms. Furthermore, the tools overcomes many of the limitations of other developmental models used for these species. Tools such as hatchR will be particularly useful for interrogating species and population responses to quickening changes to their thermal environments. While we provide numerous putative sources for parameterization and a handful of case studies, we expect the applications of hatchR far extend beyond what we envision here.
 
 # Bibliography
