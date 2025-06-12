@@ -729,67 +729,79 @@ p2.2 <- ef_vals |>
 
 This example demonstrates how **hatchR** can be used to explore evolutionary and ecological differences in thermal sensitivity across species. When combined with phylogenetic or trait-based analyses, such reaction norms can reveal how developmental strategies align with species’ ecological niches, helping to explain the persistence of closely related species across thermal gradients.
 
-## Local Adaptation
+## Local Adaptation: Cogradient Variation in Developmental Rates
 
-As was the case with the phylogenetic example, deveelopmental models may be parameterized for populations of the same species to better understand the effects of local adaptation. Here, we take data from a common garden experiment with Chinese cabbage beetles distributed across of a latitudinal cline of 3,440 kilometers [@tang2017]. The beetles were raised at six temperatures ranging from 16 to 28 C° and while development rates for females were very similar for populations from northern latitudes, populations from the south developed faster, consistent with the cogradient variation (local adaptation) where the genetic and environmental effects on phenotypes are additive [@conover2009, @sparks2022]. We further demonstrated this phenomena by fitting custom developmental models for each population (Longnan was removed because values were the same as Xiushui), showing rank order changes in developmental rates at colder temperatures, indicating cogradient phenotypes may only be expressed in a subset of temperatures (Figure 4).
+As with interspecific comparisons, developmental models can be parameterized at the population level to examine local adaptation within species. In particular, hatchR allows researchers to compare how different populations respond to temperature, helping to reveal evolved differences in thermal sensitivity across environmental gradients.
 
-```{r, fig.height= 5 , fig.width= 5, fig.align = 'center', fig.cap="Effective value models developed for five populations of cabbage beetle (females) along a latitudinal cline in China from Tang et al. 2017. Note the large difference in developmental rate between Xiushui County and the other, more notherly populations, which is indicative of cogradient variation."}
-tang_temps <- c(16,19,22,24,26,28) 
+Here, we used data from a common garden experiment on cabbage beetles (Colaphellus bowringi) reared at six constant temperatures (16–28 °C), spanning populations collected along a ~3,440 km latitudinal gradient in China [@tang2017]. Although all beetles were reared under identical conditions, developmental rates differed among populations, particularly at cooler temperatures. Populations from southern latitudes—where temperatures are generally warmer—developed more quickly than northern populations, a pattern consistent with cogradient variation, where genetic and environmental effects on a phenotype act in the same direction [@conover2009; @sparks2022].
+
+To visualize these patterns, we fit custom effective value models for five of the six populations (excluding Longnan, which duplicated the values from Xiushui). The resulting linearized effective value curves (Figure \@ref(fig:beetles)) show that beetles from Xiushui County (southernmost) had consistently faster development rates across temperatures than their more northerly counterparts. These differences are especially pronounced at cooler temperatures, suggesting that local adaptation may only manifest under certain environmental conditions.
+
+```{r beetles, fig.height=3 , fig.width=5, fig.align='center', fig.cap="Effective value models for five populations of cabbage beetles (Colaphellus bowringi, females) along a latitudinal gradient in China [@tang2017]. Models were parameterized from common garden experiments under constant temperatures. The southernmost population (Xiushui County) shows a consistently faster developmental rate than populations from more northerly sites, especially at colder temperatures. This pattern is indicative of cogradient variation, where both genetic and environmental effects reinforce the observed phenotypic trend."}
+tang_temps <- c(16, 19, 22, 24, 26, 28)
 
 
 hb <- c(24.834, 19.481, 14.172, 11.205, 9.865, 8.570)
 
-sy <- c( 23.822, 19.129, 13.644, 10.897, 9.645, 8.306)
+sy <- c(23.822, 19.129, 13.644, 10.897, 9.645, 8.306)
 
-ta <- c( 21.887, 18.381, 12.984, 10.809, 9.382, 8.130)
+ta <- c(21.887, 18.381, 12.984, 10.809, 9.382, 8.130)
 
-xy <- c( 21.623, 18.337, 12.589, 10.633, 9.205, 8.085 )
+xy <- c(21.623, 18.337, 12.589, 10.633, 9.205, 8.085)
 
-xs <- c( 21.271, 16.666, 11.797, 9.929, 9.117, 6.942)
+xs <- c(21.271, 16.666, 11.797, 9.929, 9.117, 6.942)
 
 pop_list <- list(hb, sy, ta, xy, xs)
 
-beetle_mods <- pop_list |> map(fit_model,
-                temp = tang_temps,
-                species = "cabbage beetle",
-                development_type = "hatch") |> 
-  map("expression") |> 
-  map("expression") |> 
+beetle_mods <- pop_list |>
+  map(fit_model,
+    temp = tang_temps,
+    species = "cabbage beetle",
+    development_type = "hatch"
+  ) |>
+  map("expression") |>
+  map("expression") |>
   unlist()
 
 temps <- c(12:30)
-pops = c("Haerbin City", 
-         "Shenyang City", 
-         "Taian City",
-         "Xinyang County",
-         "Xiushui County")
+pops <- c(
+  "Haerbin City",
+  "Shenyang City",
+  "Taian City",
+  "Xinyang County",
+  "Xiushui County"
+)
 
 ef_vals_pops <- NULL
 
-for( m in 1:length(beetle_mods)){
-  mod = beetle_mods[m]
-  pop = pops[m]
+for (m in 1:length(beetle_mods)) {
+  mod <- beetle_mods[m]
+  pop <- pops[m]
 
-for (x in temps) {
-  ef <- eval(parse(text = mod))
-  temp_df <- data.frame(temperature = x, 
-                        effective_value = ef, 
-                        beetle_pops = pop)
-  ef_vals_pops <- rbind(ef_vals_pops, temp_df)
-  
+  for (x in temps) {
+    ef <- eval(parse(text = mod))
+    temp_df <- data.frame(
+      temperature = x,
+      effective_value = ef,
+      beetle_pops = pop
+    )
+    ef_vals_pops <- rbind(ef_vals_pops, temp_df)
   }
 }
 
-ef_vals_pops |> tibble() |> 
+ef_vals_pops |>
+  tibble() |>
   ggplot(aes(x = temperature, y = effective_value, color = beetle_pops)) +
   geom_line() +
   geom_point() +
-  #geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
+  # geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   scale_color_brewer(palette = "Dark2", name = "Beetle Populations") +
   theme_classic() +
   theme(legend.position = c(0.25, 0.75))
 ```
+
+This example illustrates how **hatchR** can be used to explore the intersection of developmental plasticity and local adaptation using real-world data. Such applications are useful for disentangling the genetic basis of thermal sensitivity, anticipating geographic responses to climate change, and informing population-specific management strategies.
 
 # Discussion
 
