@@ -158,7 +158,7 @@ hatchR has two function to predict phenology. The first is `predict_phenology()`
 There are numerous applications for effective value models and poikilotherms that expand well beyond the bounds of this manuscript. We provide examples spanning four taxonomic classes of pikilotherms in the table below of studies that could liekly be used to parameterize custom models using the `fit_model()` function from hatchR. These are a non-exhaustive search of the both peer-reviewed and grey literature, but demonstrate the wide taxonomic breadth that could be paired with the effective value approach. We provide case studies of how these data may be used to address a variety of questions, but expect applications to extend far beyond what we demonstrate here.
 
 | Class | Order | Genera | Species | Study |
-|:--------------|:--------------|:--------------|:--------------|:--------------|
+|:---|:---|:---|:---|:---|
 | Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
 |  |  |  | *L. pipiens* |  |
 |  |  |  | *L. clamitans* |  |
