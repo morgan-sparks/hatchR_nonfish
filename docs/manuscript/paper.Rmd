@@ -36,6 +36,10 @@ Morgan M. Sparks^1^, Brian Z. Leavell^2^, Bryan M. Maitland^1^
 
 Before exogenous feeding, poikilothermic organisms have a near mechanistic relationship between ambient temperature and developmental rates. As such, statistical models can be easily developed to predict when organisms develop. Until recently, most models only used non-variable developmental regimes making them difficult to apply to wild environments. However, the R package hatchR formalized an approach using effective values where each day is given a developmental unit, accurately predicting developmental phenology for wild poikilotherms. hatchR was developed specific to fish, however this manuscript broadens the tool's application showing how it can be used to predict developmental phenology for a broad range of taxa, including amphibians, reptiles, and invertebrates. Moreover, we provide numerous examples of how this approach informs scenarios from applied management to basic questions regarding ecological and evolutionary questions.
 
+BMM's version: 
+
+Development in poikilothermic organisms is strongly temperature-dependent, particularly during early life stages prior to exogenous feeding. This thermally constrained physiology produces a near-mechanistic relationship between ambient temperature and developmental rate, allowing for predictive models of phenology. However, traditional models—often developed under constant laboratory temperatures—struggle to account for the variable thermal regimes experienced by wild populations. To address this, [@sparks2019] introduced the effective value model, a framework that integrates daily temperature data to predict developmental timing under fluctuating conditions. Building on this foundation, the R package **hatchR** was developed to operationalize the effective value model and enable its widespread application, initially focusing on fishes. In this paper, we expand the scope of **hatchR**, demonstrating its applicability across a broad range of poikilothermic taxa, including amphibians, reptiles, and aquatic invertebrates. We also illustrate how this framework supports both applied management goals—such as predicting hatching windows for conservation and monitoring—and basic research on ecological and evolutionary questions, including phenological plasticity, thermal adaptation, and life history strategies. By providing a generalizable, open-source tool, **hatchR** bridges the gap between physiological theory and real-world application, offering a robust platform for predicting developmental phenology in diverse and changing environments.
+
 \newpage
 
 # Introduction
@@ -44,27 +48,44 @@ MORE CITATIONS
 
 Because poikilothermic organisms rely on the environment to determine their body temperature, the physiological processes that regulate their bodies is tightly linked with their ambient temperature. When these organisms are in their early life histories prior to exogenous feeding, developmental rates are solely determined by environmental and genetic and/or maternal effects, with the environmental responsible for most of the variation in phenotypes [@west-eberhard2003]. In turn, while developmental rates may vary widely across species, they typically fit a consistent non-linear relationship with temperature which can be easily mathematically approximated using the power law.
 
+**BMM--**Because poikilothermic organisms rely on external sources to regulate their body temperature, the physiological processes governing their growth and development are tightly coupled to ambient thermal conditions. This relationship is especially deterministic during early life stages prior to exogenous feeding, when metabolic rates are primarily governed by environmental temperatures, modulated by genetic and maternal effects [@west-eberhard2003]. Although the absolute rate of development can vary widely among species and populations, most poikilotherms exhibit a consistent and often non-linear thermal performance curve that describes development as a function of temperature [@schoolfield1981; @angilletta2006]. These relationships can be effectively approximated with power law or exponential models that capture increasing developmental rates with rising temperature, up to a physiological optimum beyond which performance declines.
+
 Historically, predicting developmental rates for populations in the wild relied on thermal thresholds where degree days are summed from mating and phenology occurs once a thermal threshold is passed. However, these models can be error prone, especially for longer developing species, because of the non-linearity of development, where embryos developing at colder temperatures need far fewer degree days to hatch than those at warm temperatures. Similarly, when applied to wild environments models fail to account for diel variabilty, where daily (and hence developmental rates) may be highly different across early life history development. Finally, populations may be locally adapted with developmental rates varying across populations [@sparks2017].
 
+**BMM--**Historically, models of developmental phenology in wild populations have relied on the accumulation of degree days (thermal sums) above a species-specific threshold. While widely used, degree-day models are fundamentally linear and fail to account for the non-linear nature of development, leading to biased predictions under fluctuating temperature regimes [@neuheimer2009]. This is particularly problematic for long-developing species or for organisms in variable climates, where embryos incubating at colder temperatures often require fewer thermal units to complete development than those incubating in warmer environments. Moreover, traditional models often assume temporally invariant developmental rates and do not incorporate diel temperature variability, which can significantly affect development in systems with large day–night thermal swings. Finally, developmental reaction norms may vary across populations due to local adaptation or phenotypic plasticity, further complicating predictions [@sparks2017; @angilletta2009].
+
 To address these issues in fishes, ***Sparks et al.*** (XXX)developed hatchR, which leverages effective value models developed by @sparks2019. The models function using developmental curves fit from experiments where organisms are raised at different temperatures and reciprocating those models to provide daily development estimates and are readily applied to wild environments. hatchR is packaged as an available R package on CRAN, as well as a Shiny app presented as a graphical-user-interface. While hatchR was developed specifically for fishes, the approach functions equally well for any poikilotherm for which development roughly follows a power law relationship. Here, we demonstrate the wide applicability of hatchR to non-fish organisms providing numerous putative sources for parameterizing developmental models across broad taxa and three specific examples of how hatchR can be used to investigate questions regarding ecological and inter- and intraspecies relationships.
+
+**BMM--**To address these limitations in fishes, [@sparks2019] introduced the effective value model—an approach that captures the non-linear, temperature-dependent nature of development by integrating experimental data into a daily developmental rate function. Building on that work, the R package **hatchR** [CITE hatchR] was developed to operationalize the effective value framework and make it accessible to researchers and managers. **hatchR** uses temperature-performance curves generated from lab-based thermal rearing trials to estimate the proportion of development achieved each day under observed temperature conditions. These daily contributions are summed until a cumulative threshold (typically 1.0) is reached, marking the completion of a developmental stage. The package includes both an R-based workflow and a user-friendly Shiny web interface to facilitate broad adoption across research and management communities.
+
+**BMM--**While hatchR was originally developed for coldwater fishes, the approach is broadly applicable to any poikilothermic organism whose development conforms to a monotonic or unimodal temperature–rate relationship, including many amphibians, reptiles, and invertebrates. In this manuscript, we expand the taxonomic scope of **hatchR**, compiling thermal developmental data from the literature and demonstrating how effective value modeling can be applied to diverse taxa. We also present three case studies illustrating how **hatchR** can inform ecological, evolutionary, and management questions—ranging from understanding thermal adaptation and phenological mismatches to forecasting hatch timing in conservation planning. These applications are increasingly relevant as freshwater ecosystems face intensifying and interacting stressors, including climate change, habitat alteration, and invasive species, all of which can disrupt developmental timing and population dynamics [@craig2017; ADD ANOTHER BROAD PAPER].
+
+Angilletta, M. J. (2006). Estimating and comparing thermal performance curves. Journal of Thermal Biology.
+
+Angilletta, M. J. (2009). Thermal Adaptation: A Theoretical and Empirical Synthesis.
+
+Schoolfield, R. M., Sharpe, P. J. H., & Magnuson, C. E. (1981). Non-linear regression of biological temperature-dependent rate models. Journal of Theoretical Biology.
+
+Neuheimer, A. B., & Taggart, C. T. (2007). The growing degree-day and fish size-at-age: the overlooked metric. Canadian Journal of Fisheries and Aquatic Sciences.
 
 # Methods
 
 ## Effective value models
 
-Effective value models function by leveraging the statistical relationship derived from raising poikilotherms at different temperatures and fitting that relationship with a non-linear model. The formulation of that relationship can then be reciprocated which provides the unit of development for a day's average temperature--an effective value. Effective value models function then by cumulatively summing to one at which the organism achieves the development of the parameterized trait.
+Effective value models estimate developmental progress based on empirically derived relationships between temperature and development rate. These relationships are typically parameterized by raising organisms at constant temperatures in laboratory settings, then fitting a non-linear function that captures the temperature-dependence of development. This function can then be reciprocated to produce daily “effective values”—units of development—that accumulate over time.
 
-The model follows the general format of:
+
+Each day's developmental contribution is calculated using the general power-law form:
 
 $$
 Effective Value_i = 1/exp(log_ea - log_e(Temperature_i - b))
 $$
 
-Where *i* is the daily value and a fish hatches or emerges when the cumulative sum reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
+where $$i$$ is the index for each day, $$a$$ and $$b$$ are empirically derived parameters, and temperature is the average for that day. Development is complete once the cumulative sum of daily effective values reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
 
-As an example, we parameterize an effective value model for coastal tailed frogs (*Ascaphus truei*) common to western North America (Figure 1). Custom parameterized models use the `fit_model()` function in hatchR, which is built on model 2 using the power law from @beacham1990. Alternatively, to predict phenology using hatchR, the `predict_phenology()` only requires a model expression as input and could assume other model formulations custom built outside of the package by the user.
+To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure \@ref(fig:tail-frog)). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data (**CITE**). While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions. 
 
-```{r, fig.align = 'center', fig.cap="Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
+```{r tail-frog, fig.align = 'center', fig.cap="Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
 # https://www.sciencedirect.com/science/article/pii/030096297590033X
 
@@ -115,15 +136,11 @@ p2 <- ascaphus_ef |>
 p1 + p2 + plot_annotation(tag_levels = 'A')
 ```
 
-## Data and data checks
+## Data input and quality checks
 
-hatchR requires two essential paired vectors of data, one of daily average temperature and the other the date for those temperatures. The software is designed to function around common field temperature loggers and provides users the ability to summarize temperatures with multiple daily recordings.
+**hatchR** requires two core inputs: a vector of daily average water temperatures and a corresponding vector of calendar dates. These data are typically collected from field-deployed temperature loggers. For loggers that record sub-daily temperatures, **hatchR** includes the function `summarize_temp()` to compute daily means. Data completeness and consistency can be checked using `plot_check_temp()` and `check_continuous()` to ensure there are no gaps or anomalies in the temperature record (Table \@ref(tab:eg-temp-data)).
 
-### Data input
-
-Maybe include the below:
-
-```{r}
+```{r eg-temp-data}
 df <- data.frame(
   date = c(
     "2024-01-01",
@@ -143,7 +160,7 @@ df <- data.frame(
 
 knitr::kable(df,
   booktabs = TRUE,
-  caption = "Example temperature data for use in hatchR."
+  caption = "Example water temperature data. Temperature data are typically collected from field loggers and summarized to daily averages. Each row represents a date–temperature pair used to estimate daily effective values for phenology modeling."
 )
 ```
 
@@ -151,7 +168,9 @@ If you import data from raw files with multiple daily readings, the package allo
 
 ## Predicting phenology
 
-hatchR has two function to predict phenology. The first is `predict_phenology()` where users input date of reproductive event (`spawn.date`) along with their daily average temperature and corresponding dates. Alternatively, the function `predict_spawn()` leverages the effective value model framework but works backward from observed or expected development. For example, if a user observed one of the many frog or reptile parameterizations below in an area where they had accurate temperature measurements, they could easily estimate when those individuals' adults mated.
+Developmental phenology can be predicted in two ways using hatchR. The `predict_phenology()` function estimates the date at which development completes, given a known reproductive event (e.g., oviposition or spawning; `spawn.date`) and daily temperature data. Alternatively, the `predict_spawn()` function works in reverse—estimating the likely date of a reproductive event based on a known or observed hatch/emergence date. This is especially useful for retrospective analyses or for estimating breeding windows from field observations. 
+
+**BMM NOTE: Seems like we should include a figure of output here. Could just add a panel to figure 1 with days to develop plot.**
 
 # Case studies
 
