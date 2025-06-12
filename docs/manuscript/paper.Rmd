@@ -40,13 +40,13 @@ Before exogenous feeding, poikilothermic organisms have a near mechanistic relat
 
 # Introduction
 
-P1: Poikilotherms and ambient temperatures
+MORE CITATIONS
 
-P2: ATU models and effective value models
+Because poikilothermic organisms rely on the environment to determine their body temperature, the physiological processes that regulate their bodies is tightly linked with their ambient temperature. When these organisms are in their early life histories prior to exogenous feeding, developmental rates are solely determined by environmental and genetic and/or maternal effects, with the environmental responsible for most of the variation in phenotypes [@west-eberhard2003]. In turn, while developmental rates may vary widely across species, they typically fit a consistent non-linear relationship with temperature which can be easily mathematically approximated using the power law.
 
-P3: Examples with other species
+Historically, predicting developmental rates for populations in the wild relied on thermal thresholds where degree days are summed from mating and phenology occurs once a thermal threshold is passed. However, these models can be error prone, especially for longer developing species, because of the non-linearity of development, where embryos developing at colder temperatures need far fewer degree days to hatch than those at warm temperatures. Similarly, when applied to wild environments models fail to account for diel variabilty, where daily (and hence developmental rates) may be highly different across early life history development. Finally, populations may be locally adapted with developmental rates varying across populations [@sparks2017].
 
-P4: Our approach here (R package and Shiny app)
+To address these issues in fishes, ***Sparks et al.*** (XXX)developed hatchR, which leverages effective value models developed by @sparks2019. The models function using developmental curves fit from experiments where organisms are raised at different temperatures and reciprocating those models to provide daily development estimates and are readily applied to wild environments. hatchR is packaged as an available R package on CRAN, as well as a Shiny app presented as a graphical-user-interface. While hatchR was developed specifically for fishes, the approach functions equally well for any poikilotherm for which development roughly follows a power law relationship. Here, we demonstrate the wide applicability of hatchR to non-fish organisms providing numerous putative sources for parameterizing developmental models across broad taxa and three specific examples of how hatchR can be used to investigate questions regarding ecological and inter- and intraspecies relationships.
 
 # Methods
 
