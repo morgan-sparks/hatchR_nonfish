@@ -15,8 +15,11 @@ knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE,
                       message = FALSE)
 
+
 library(hatchR)
+library(here)
 library(tidyverse)
+library(readxl)
 library(patchwork)
 library(ggridges)
 library(modelbased)
@@ -253,7 +256,186 @@ reptiles |>
 
 ## Ecological
 
-To demonstrate an ecological application for hatchR, we used estimates for oviposition timing for *A. truei* from @karraker2006 (unpublished data). Using the parameterized coastal tailed frog model presented above (Figure 1) and assumed a fixed oviposition date based on the estimates from @karraker2006 we predicted days to hatch for populations in Washington and Oregon, where long-term temporal predictions of stream temperature were available [@siegel2023] at the COMID level. Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with average days to hatch taking more than twice as long in Olympic National Park as in the Willapa Hills (32 days compared to 15 days). When broken down by site, there was a weak but significant relationship between year and days to hatch (Supplemental Data), with slight negative trend over the thirty year period, indicating temperatures at the sites were warming (Figure 2). Over the 30-year period, the site with the quickest average developmental period was in the Willapa Hills (15 days) and the site with the longest average developmental period was in Olympic National Park (44 days). Finally, the standard deviation at Willapa Hills, Siskiyou Mountains, and Cascade Mountains was much lower (\<3) than that of the Olympic National Park sites (11.0) indicating much greater sensitivity to temperature change over the past 30-years in the park.
+To demonstrate an ecological application for **hatchR**, we modeled variation in developmental timing for coastal tailed frogs (*A. truei*) across their range in the Pacific Northwest. Using oviposition estimates from @karraker2006 (unpublished data) and our earlier parameterized effective value model (Figure \@ref(fig:tail-frog)), we simulated daily development across 30 years (1991-2020) using modeled stream temperature data from @siegel2023. 
+
+```{r tail-frog-pheno}
+# Read data
+ascaphus_siegel_data <- readRDS(here("data/ascaphus_siegel_data.rds")) |>
+  mutate(date = ymd(tim.date))
+
+ascaphus_sites <- read_xlsx(here("data/ascaphus_locations.xlsx")) |> 
+  drop_na(comid)
+
+# karraker_data <- readxl::read_xls("../../data/ASMO_ASTR_egg_data.xls")
+
+pred_hatch <- NULL
+for (sites in unique(ascaphus_siegel_data$COMID)) {
+  ascaphus_site <- ascaphus_sites |> filter(comid == sites)
+
+  month <- month(ascaphus_site$oviposition_date)
+  mday <- mday(ascaphus_site$oviposition_date)
+
+  spawn_dates <- map(
+    c(1991:2020), # year vector to map for custom function
+    function(year) { # custom function to make dates
+      paste0(year, "-", month, "-", mday)
+    }
+  ) |>
+    unlist()
+
+  site <- ascaphus_siegel_data |>
+    filter(COMID == sites) |>
+    drop_na(prd.stream_temp)
+
+  # spawn_dates <- spawn_dates[which(spawn_dates %in% site$tim.date)]
+
+  hatch <- map(spawn_dates,
+    predict_phenology,
+    data = site,
+    temperature = prd.stream_temp,
+    dates = date,
+    model = ascaphus_mod$expression$expression
+  ) |>
+    map_df("dev_period") |>
+    mutate(days = stop - start)
+
+  temp_df <- data.frame(
+    days = hatch$days,
+    comid = rep(sites, times = length(hatch)),
+    year = year(spawn_dates)
+  )
+
+  pred_hatch <- rbind(pred_hatch, temp_df)
+}
+
+model_data <- pred_hatch |>
+  left_join(ascaphus_sites |> 
+              group_by(comid) |> 
+              slice_head(n = 1), 
+            by = join_by(comid == comid)
+            ) |>
+  mutate(
+    days = as.integer(days),
+    comid = as.factor(comid)
+    )
+
+# model_data |>
+#   ggplot() +
+#   geom_density_ridges(aes(y = as.factor(year), x = days , fill = Mountain)) +
+#   theme_classic() +
+#   theme(legend.position = "none")
+# 
+# model_data |>
+#   ggplot(aes(x = year, y = days , color= Mountain, group = comid)) +
+#   geom_point() +
+#   #geom_line() +
+#   geom_smooth(method = "lm", se = FALSE) +
+#   labs(x= "Year", y = "Hatch Date") +
+#   theme_classic() +
+#   theme(legend.position = c(0.8, 0.75))
+
+model_data <- model_data |> 
+  mutate(Mountain = as.factor(Mountain), 
+         comid = as.factor(comid))
+
+mtns <- model_data |> distinct(Mountain) |>
+  as_tibble() |> pull(Mountain) |> 
+  stringr::str_c(collapse = ", ")
+
+mean_dev_mtn <- model_data |> 
+  drop_na(days) |>  
+  group_by(Mountain) |> 
+  summarise(mean_hatch = round(mean(days), 1),
+            sd_hatch =sd(days))
+
+mean_dev_comid_mtn <- model_data |> 
+  drop_na(days) |>  
+  group_by(Mountain, comid) |> 
+  summarise(mean_hatch = round(mean(days), 1))
+
+```
+
+The dataset included `r nrow(model_data)` observations of predicted days to hatching, drawn from `r length(unique(model_data$comid))` stream reaches (COMIDs) nested within four mountain ranges: Olympic National Park, the Cascade Mountains, the Siskiyou Mountains, and the Willapa Hills. Each COMID had between 20 and 30 years of predictions. 
+
+We evaluated eight candidate linear models that varied in the inclusion and interaction of year, COMID, and mountain range effects. Based on adjusted R², AICc, and RMSE, the best-supported model included year and COMID as additive fixed effects: days_to_hatch ~ year + comid. 
+
+```{r frog-mods}
+# mod <- lm(days ~ year * comid + Mountain, data = model_data)
+
+m1 <- lm(days ~ year, data = model_data)
+m2 <- lm(days ~ year + comid, data = model_data)
+m3 <- lm(days ~ year + Mountain, data = model_data)
+m4 <- lm(days ~ year + comid + Mountain, data = model_data)
+m5 <- lm(days ~ year * comid, data = model_data)
+m6 <- lm(days ~ year * comid + Mountain, data = model_data)
+m7 <- lm(days ~ year * Mountain, data = model_data)
+m8 <- lm(days ~ year * Mountain + comid, data = model_data)
+
+# sjPlot::tab_model(m2)
+
+perf <- performance::compare_performance(
+  m1, m2, m3, m4, m5, m6, m7, m8,
+  rank = TRUE
+)
+
+params <- parameters::model_parameters(m2)
+```
+
+This model explained ~`r round(perf[1,4], 2)*100`% of the variation in developmental timing (adjusted R² = `r round(perf[1,4], 3)`), with year having a significant weak and negative effect (`r round(params[2,2], 2)` days/year, p = 0.001), indicating an overall trend toward faster development consistent with regional warming (Figure \@ref(fig:frog-preds)A). COMID effects captured the persistent differences in thermal regimes among streams, with estimated marginal means ranging from ~15 to ~44 days to hatch across sites (Figure \@ref(fig:frog-preds)B).
+
+```{r frog-preds, fig.height=6 , fig.width=8, fig.align='center', fig.cap="Modeled changes in developmental timing for coastal tailed frogs (Ascaphus truei) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals."}
+
+# plot(estimate_means(m2, c("year"), preserve_range = TRUE))
+# plot(estimate_means(m2, c("comid"), preserve_range = TRUE))
+# plot(estimate_means(m2, c("year", "comid"), preserve_range = TRUE))
+
+means_all <- estimate_means(m2, c("year"), preserve_range = TRUE) |> 
+  tibble()
+
+p.01 <- means_all |> 
+  ggplot(aes(year, Mean, ymin = CI_low, ymax = CI_high)) +
+  geom_ribbon(alpha = 0.05, color = NA) +
+  geom_line(size = 1.1)  +
+  labs(x = "Year", y = "Mean of Days to Hatch") +
+  theme_classic()
+
+means <- estimate_means(m2, c("year", "comid"), preserve_range = TRUE) |> 
+  tibble() |>
+  mutate(comid = as.integer(as.character(comid))) |>
+  left_join(
+    ascaphus_sites |> distinct(comid, Mountain),
+    by = join_by(comid == comid)
+  ) |>
+  mutate(comid = as.factor(comid)) 
+
+p.02 <- means |> 
+  ggplot(
+    aes(
+      x = year, y = Mean,
+      ymin = CI_low, ymax = CI_high,
+      group = comid,
+      fill = Mountain,
+      color = Mountain, 
+      # linetype = comid
+    )
+  ) +
+  geom_line(size = 1.1) +
+  geom_ribbon(alpha = 0.05, color = NA) +
+  labs(x = "Year", y = "Mean of Days to Hatch") +
+  theme_classic()
+
+p.01 + p.02 + plot_annotation(tag_levels = 'A')
+
+
+# estimate_means(mod, c("year", "comid")) |>
+#   plot() +
+#   #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
+#   labs(x = "Year", y = "Mean of Days to Hatch") +
+#   theme_classic()
+```
+
+Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with sites in Olympic National Park consistently having the longest development times and the greatest interannual variability (SD ≈ 11 days), while lowland streams in the Willapa Hills developed fastest with minimal variability (SD < 3 days). These results demonstrate the capacity of **hatchR** to detect spatiotemporal phenological variation and forecast potential shifts under shifting climate patterns.
+
 
 ```{r, eval=FALSE}
 ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
@@ -306,115 +488,6 @@ ascaphus_siegel_data <- rbind(ascaphus_siegel_data, huc_10_df)
 write_rds( ascaphus_siegel_data, "../../data/ascaphus_siegel_data.rds", compress = "gz" )
 ```
 
-\
-
-```{r, fig.height= 6 , fig.width= 8, fig.align = 'center', fig.cap="Estimated marginal means of days to hatch for coastal tailed frogs from various mountain ranges across their range."}
-ascaphus_siegel_data <- readRDS("../../data/ascaphus_siegel_data.rds") |> 
-  mutate(date = ymd(tim.date))
-
-ascaphus_sites <- readxl::read_xlsx("../../data/ascaphus_locations.xlsx") |> drop_na(comid)
-
-#karraker_data <- readxl::read_xls("../../data/ASMO_ASTR_egg_data.xls")
-
-
-
-pred_hatch = NULL
-for(sites in unique(ascaphus_siegel_data$COMID)) {
-  
-  ascaphus_site <- ascaphus_sites |> filter(comid == sites)
-  
-  month <- month(ascaphus_site$oviposition_date)
-  mday <- mday(ascaphus_site$oviposition_date)
-  
-  spawn_dates <- map(
-  c(1991:2020), # year vector to map for custom function
-  function(year) { # custom function to make dates
-      paste0(year,"-", month, "-", mday)
-    }
-  ) |> 
-  unlist()
-  
-  site <-  ascaphus_siegel_data |> filter( COMID == sites) |> drop_na(prd.stream_temp)
-  
- # spawn_dates <- spawn_dates[which(spawn_dates %in% site$tim.date)]
-  
-  hatch <- map(spawn_dates, 
-               predict_phenology,
-              data = site,
-              temperature = prd.stream_temp,
-              dates = date,
-              model = ascaphus_mod$expression$expression) |> 
-    map_df("dev_period") |> 
-    mutate(days = stop -start)
-  
-  temp_df <- data.frame(days = hatch$days,
-                        comid = rep(sites, times =length(hatch)),
-                        year = year(spawn_dates))
-  
-  pred_hatch <- rbind(pred_hatch, temp_df)
-}
-
-model_data <- pred_hatch |> 
-  left_join(ascaphus_sites |> group_by(comid) |> slice_head( n =1), by = join_by(comid == comid)) |> 
-  mutate(days = as.integer(days),
-         comid = as.factor(comid))
-
-# model_data |>
-#   ggplot() +
-#   geom_density_ridges(aes(y = as.factor(year), x = days , fill = Mountain)) +
-#   theme_classic() +
-#   theme(legend.position = "none")
-# 
-# model_data |>
-#   ggplot(aes(x = year, y = days , color= Mountain, group = comid)) +
-#   geom_point() +
-#   #geom_line() +
-#   geom_smooth(method = "lm", se = FALSE) +
-#   labs(x= "Year", y = "Hatch Date") +
-#   theme_classic() +
-#   theme(legend.position = c(0.8, 0.75))
-
-mod <- lm(days ~ year*as.factor(comid) + Mountain, data = model_data)
-
-means <- estimate_means(mod, c("year", "comid")) |>  tibble()
-
-means  |> 
-  mutate(comid = as.integer(as.character(comid))) |> 
-  left_join(ascaphus_sites, by = join_by(comid == comid)) |> 
-  ggplot(aes(x = year,
-             y = Mean,
-                  ymin= CI_low, 
-                  ymax = CI_high,
-                  group = comid,
-                  fill = Mountain,
-             color = Mountain)) +
-  geom_line(size = 1.1) +
-  geom_ribbon(alpha = 0.05, color = NA) +
-  labs(x = "Year", y = "Mean of Days to Hatch") +
-  theme_classic()
-
-# estimate_means(mod, c("year", "comid")) |> 
-#   plot() +
-#   #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
-#   labs(x = "Year", y = "Mean of Days to Hatch") +
-#   theme_classic()
-```
-
-```{r, eval=FALSE}
-
-model_data |> 
-  drop_na(days) |>  
-  group_by(Mountain) |> 
-  summarise(mean_hatch = round(mean(days), 1),
-            sd_hatch =sd(days))
-
-model_data |> 
-  drop_na(days) |>  
-  group_by(Mountain, comid) |> 
-  summarise(mean_hatch = round(mean(days), 1))
-
-sjPlot::tab_model(mod)
-```
 
 ## Phylogenetic
 
