@@ -164,26 +164,26 @@ Developmental phenology can be predicted in two ways using hatchR. The `predict_
 
 The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. Below, we provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature. These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span four taxonomic classes—amphibians, reptiles, insects, and crustaceans—and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
 
-| Class | Order | Genera | Species | Study |
-|:--------------|:--------------|:--------------|:--------------|:--------------|
-| Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
-|  |  |  | *L. pipiens* |  |
-|  |  |  | *L. clamitans* |  |
-|  |  |  | *L. palustris* |  |
-|  |  | *Ascaphus* | *A. truei* | @brown1975 |
-|  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
-| Reptilia | Squamata | *Sceloporus* | *S. undulatus* | @angilletta2000 |
-|  |  | *Podarcis* | *P. mural*is | @vandamme1992 |
-|  | Testudines | *Mauremys* | M. reevesii | @du2007 |
-|  |  |  | 181 species | 141 studies in @while2018 |
-| Insecta | Plecoptera | *Nemurella* | *N. pictetii* | @brittain1978, @elliott1984 |
-|  |  | *Capnia* | *C. atra* | @brittain1984 |
-|  |  | *Capnia* | *C. bifrons* | @elliott1986 |
-|  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
-|  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
-|  | Coleoptera | *Colaphellus* | *C. bowringi* | @tang2017 |
-|  |  |  | 18 species | Developmental equations in @pritchard1987 |
-| Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
+| Class        | Order      | Genera         | Species            | Study                                     |
+|:-------------|:-----------|:---------------|:-------------------|:------------------------------------------|
+| Amphibia     | Anura      | *Lithobates*   | *L. sylvaticus*    | @moore1939                                |
+|              |            |                | *L. pipiens*       |                                           |
+|              |            |                | *L. clamitans*     |                                           |
+|              |            |                | *L. palustris*     |                                           |
+|              |            | *Ascaphus*     | *A. truei*         | @brown1975                                |
+|              | Urodela    | *Ambystoma*    | *A. gracile*       | @brown1976                                |
+| Reptilia     | Squamata   | *Sceloporus*   | *S. undulatus*     | @angilletta2000                           |
+|              |            | *Podarcis*     | *P. mural*is       | @vandamme1992                             |
+|              | Testudines | *Mauremys*     | M. reevesii        | @du2007                                   |
+|              |            |                | 181 species        | 141 studies in @while2018                 |
+| Insecta      | Plecoptera | *Nemurella*    | *N. pictetii*      | @brittain1978, @elliott1984               |
+|              |            | *Capnia*       | *C. atra*          | @brittain1984                             |
+|              |            | *Capnia*       | *C. bifrons*       | @elliott1986                              |
+|              |            | *Mesocapnia*   | *M. oenone*        | @brittain1984                             |
+|              |            | *Taeniopteryx* | *T. nebulosa*      | @brittain1977                             |
+|              | Coleoptera | *Colaphellus*  | *C. bowringi*      | @tang2017                                 |
+|              |            |                | 18 species         | Developmental equations in @pritchard1987 |
+| Malacostraca | Decapoda   | *Pontastacus*  | *P. leptodactylus* | @aydin2004                                |
 
 : Example sources for effective value parameterization using `fit_model()` in **hatchR.** This compilation spans amphibians, reptiles, aquatic and terrestrial insects, and decapod crustaceans. Some entries, such as @while2018 and @pritchard1987, represent broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
 
