@@ -199,7 +199,7 @@ The effective value modeling framework is broadly applicable across poikilotherm
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
 |              |               | *Dendroctonus*  | *D. ponderosae*    | Régnière et al. (2012) [10.1016/j.jinsphys.2012.01.010](https://doi.org/10.1016/j.jinsphys.2012.01.010) |
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
-|              | Lepidoptera   | *Choristoneura* | *C. fumiferana*    | Régnière et al. (2012) [10.1016/j.jinsphys.2012.01.010](https://doi.org/10.1016/j.jinsphys.2012.01.010) |
+|              | Lepidoptera   | *Choristoneura* | *C. occidentalis*  | Régnière et al. (2012) [10.1016/j.jinsphys.2012.01.010](https://doi.org/10.1016/j.jinsphys.2012.01.010) |
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
 |              |               | *Zeiraphera*    | *Z. canadensis*    | Régnière et al. (2012) [10.1016/j.jinsphys.2012.01.010](https://doi.org/10.1016/j.jinsphys.2012.01.010) |
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
@@ -207,7 +207,7 @@ The effective value modeling framework is broadly applicable across poikilotherm
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
 | Malacostraca | Decapoda      | *Pontastacus*   | *P. leptodactylus* | @aydin2004                                                                                              |
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
-| Copepoda     | Calanoida     | 13 genera       |                    | Forster et al. (2011) <https://doi.org/10.1086/662174>                                                  |
+| Copepoda     | Calanoida     | 11 genera       |                    | Forster et al. (2011) <https://doi.org/10.1086/662174>                                                  |
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
 |              | Cyclopoida    | 3 genera        |                    | Forster et al. (2011) <https://doi.org/10.1086/662174>                                                  |
 +--------------+---------------+-----------------+--------------------+---------------------------------------------------------------------------------------------------------+
@@ -284,7 +284,7 @@ To demonstrate an ecological application for **hatchR**, we modeled variation in
 
 **BCL NOTE: It feels like this section jumps into the methods a bit too quick, without providing context. At the start of this first paragraph, it would be worth providing a broad, 2-3 sentence overview of the "what" and "why" of this specific ecological application... e.g. (rough idea), "Examining variation in development across space and time is critical to understand how organisms respond to ecological factors such as climate change [CITATION]. Here, we first demonstrate an application of hatchR to predict hatching times from a spatiotemporally extensive dataset. Using these predictions, we then show how one can examine putative drivers of variation in development and discuss their application in forecasting future responses."**
 
-```{r tail-frog-pheno}
+```{r tail-frog-pheno, eval = FALSE}
 # Read data
 ascaphus_siegel_data <- readRDS(here("data/ascaphus_siegel_data.rds")) |>
   mutate(date = ymd(tim.date))
@@ -381,13 +381,13 @@ mean_dev_comid_mtn <- model_data |>
 
 ```
 
-The dataset included `r nrow(model_data)` observations of predicted days to hatching, drawn from `r length(unique(model_data$comid))` stream reaches (labeled with Common Identifiers, i.e., COMIDs) nested within four mountain ranges: Olympic National Park, the Cascade Mountains, the Siskiyou Mountains, and the Willapa Hills. Each COMID had between 20 and 30 years of predictions.
+The dataset included r nrow(model_data) observations of predicted days to hatching, drawn from r length(unique(model_data\$comid)) stream reaches (labeled with Common Identifiers, i.e., COMIDs) nested within four mountain ranges: Olympic National Park, the Cascade Mountains, the Siskiyou Mountains, and the Willapa Hills. Each COMID had between 20 and 30 years of predictions.
 
 **BCL NOTES: 1) It isn't clear to me what the original data consists of and what was modeled. It sounds like the original data is just oviposition observation dates, effective values, and stream temps. But in the paragraph above, "The dataset included observations of predicted days to hatching" makes me question what was data and what was modeled. It seems like the model generated predicted days to hatching?, which would not be "observations" and would not be part of the "dataset". (I think it is the "observations of predicted days" that is throwing me, as one doesn't observe predictions... I mean, technical you could, but I don't think that's what is meant.) But below, it states that the "model explained X% of the variation in developmental timing", suggesting that there was original hatching data to which the predicted hatching times were compared? Clearly, I'm confused. lol. Could just be me, but maybe worth being more specific and hand-holdy. 2) I explained "COMID" above, as not everyone will know what that means (especially if anticipating a broad readership). But please change if there's a better way.**
 
 We evaluated eight candidate linear models that varied in the inclusion and interaction of year, COMID, and mountain range effects. Based on adjusted R², AICc, and RMSE, the best-supported model included year and COMID as additive fixed effects: days_to_hatch \~ year + comid.
 
-```{r frog-mods}
+```{r frog-mods, eval = FALSE}
 # mod <- lm(days ~ year * comid + Mountain, data = model_data)
 
 m1 <- lm(days ~ year, data = model_data)
@@ -409,11 +409,11 @@ perf <- performance::compare_performance(
 params <- parameters::model_parameters(m2)
 ```
 
-This model explained \~`r round(perf[1,4], 2)*100`% of the variation in developmental timing (adjusted R² = `r round(perf[1,4], 3)`), with year having a significant weak and negative effect (`r round(params[2,2], 2)` days/year, p = 0.001), indicating an overall trend toward faster development consistent with regional warming (Figure \@ref(fig:frog-preds)A). COMID effects captured the persistent differences in thermal regimes among streams, with estimated marginal means ranging from \~15 to \~44 days to hatch across sites (Figure \@ref(fig:frog-preds)B).
+This model explained r round(perf[1,4], 2)\*100 % of the variation in developmental timing (adjusted R² = r round(perf[1,4], 3)), with year having a significant weak and negative effect (r round(params[2,2], 2) days/year, p = 0.001), indicating an overall trend toward faster development consistent with regional warming (Figure \@ref(fig:frog-preds)A). COMID effects captured the persistent differences in thermal regimes among streams, with estimated marginal means ranging from \~15 to \~44 days to hatch across sites (Figure \@ref(fig:frog-preds)B).
 
 **BCL (minor) NOTE: *Ascaphus truei* needs italics in Fig. 2, but not sure how to edit**
 
-```{r frog-preds, fig.height=3 , fig.width=8, fig.align='center', fig.cap="Modeled changes in developmental timing for coastal tailed frogs (Ascaphus truei) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals."}
+```{r frog-preds, fig.height=3 , fig.width=8, fig.align='center', fig.cap="Modeled changes in developmental timing for coastal tailed frogs (Ascaphus truei) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals.", eval = FALSE}
 
 # plot(estimate_means(m2, c("year"), preserve_range = TRUE))
 # plot(estimate_means(m2, c("comid"), preserve_range = TRUE))
