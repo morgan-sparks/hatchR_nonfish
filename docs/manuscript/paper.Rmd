@@ -8,7 +8,7 @@ header-includes:
    - \linenumbers
    - \usepackage{setspace}
    - \doublespacing
-csl: apa.csl
+csl: methods-in-ecology-and-evolution.csl
 bibliography: references.bib
 ---
 
@@ -28,23 +28,13 @@ library(modelbased)
 library(taxize)
 ```
 
-# A generalizable tool for predicting developmental phenology for wild poikilotherms.
-
-Morgan M. Sparks^1,3^, Brian Z. Leavell^2^, Bryan M. Maitland^1^
-
-^1^Rocky Mountain Research Station, U.S. Forest Service, Boise, Idaho, USA
-
-^2^Division of Biological Sciences, Purdue University, West Lafayette, Indiana, USA
-
-^3^Corresponding author, Morgan.Sparks\@usda.gov
-
-keywords: hatchR, developmental phenology, local adaptation, reaction norm, R, Shiny
-
 \newpage
 
 # Abstract
 
 Development in poikilothermic organisms is strongly temperature-dependent, particularly during early life stages prior to exogenous feeding. This thermally constrained physiology produces a near-mechanistic relationship between ambient temperature and developmental rate, allowing for predictive models of phenology. However, traditional models—often developed under constant laboratory temperatures—struggle to account for the variable thermal regimes experienced by wild populations. To address this, [@sparks2019] introduced the effective value model, a framework that integrates daily temperature data to predict developmental timing under fluctuating conditions. Building on this foundation, the R package **hatchR** was developed for fishes to operationalize the effective value model and enable its widespread application. In this paper, we expand the scope of **hatchR**, demonstrating its applicability across a broad range of poikilothermic taxa, including amphibians, reptiles, and aquatic invertebrates. We also illustrate how this framework supports both applied management goals—such as predicting hatching windows for conservation and monitoring—and basic research on ecological and evolutionary questions, including phenological plasticity, thermal adaptation, and life history strategies. By providing a generalizable, open-source tool, **hatchR** bridges the gap between physiological theory and real-world application, offering a robust platform for predicting developmental phenology in diverse and changing environments.
+
+keywords: developmental phenology, hatchR, local adaptation, R, reaction norm, Shiny
 
 \newpage
 
@@ -166,7 +156,7 @@ Developmental phenology can be predicted in two ways using hatchR. The `predict_
 The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. Below, we provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature. These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span seven taxonomic classes—amphibians, reptiles, insects, crustaceans, copepods, cephalopods, and asteroids (starfishes) —and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
 
 | Class | Order | Genus | Species | Study |
-|:--------------|:--------------|:--------------|:--------------|:--------------|
+|:---|:---|:---|:---|:---|
 | Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
 |  |  |  | *L. pipiens* |  |
 |  |  |  | *L. clamitans* |  |
@@ -783,9 +773,5 @@ Given the wide potential applicability of **hatchR**, we especially emphasize it
 # Conclusion
 
 Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of climate change. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
-
-# Acknowledgements
-
-We thank N. Karraker, D. Pilliod, M. Hayes, R.B. Bury, and B. Norman for their help in translating sites for the tailed frog example to locations that could be aligned with COMIDs. D. Horan helped organize GPS locations into COMIDs. The views expressed in this manuscript are those of the authors and do not necessarily represent the views or policies of USFS . Any mention of trade names, products, or services does not imply an endorsement by the U.S. government or USFS. USFS does not endorse any commercial products, services or enterprises.
 
 # Bibliography
