@@ -155,7 +155,7 @@ Developmental phenology can be predicted in two ways using hatchR. The `predict_
 The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. Below, we provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature. These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span seven taxonomic classes—amphibians, reptiles, insects, crustaceans, copepods, cephalopods, and asteroids (starfishes) —and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
 
 | Class | Order | Genus | Species | Study |
-|:---|:---|:---|:---|:---|
+|:--------------|:--------------|:--------------|:--------------|:--------------|
 | Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
 |  |  |  | *L. pipiens* |  |
 |  |  |  | *L. clamitans* |  |
@@ -217,7 +217,7 @@ tax_names |>
 
 ## Ecological Application: Spatial and Temporal Trends in Development
 
-Examining variation in development across space and time is critical to understand how organisms respond to ecological factors such as climate change [@pinsky2019]. Here, we first demonstrate an application of hatchR to predict hatching times from a spatio-temporally extensive dataset. Using these predictions, we then show how one can examine putative drivers of variation in development and discuss their application in forecasting future responses.
+Examining variation in development across space and time is critical to understand how organisms respond to ecological factors such as changing environments [@pinsky2019]. Here, we first demonstrate an application of hatchR to predict hatching times from a spatio-temporally extensive dataset. Using these predictions, we then show how one can examine putative drivers of variation in development and discuss their application in forecasting future responses.
 
 We modeled variation in developmental timing for coastal tailed frogs (*A. truei*) across their range in the Pacific Northwest. Using oviposition estimates from @karraker2006 (unpublished data) and our earlier parameterized effective value model (Figure \@ref(fig:tail-frog)), we simulated daily development across 30 years (1991-2020) using modeled stream temperature data from @siegel2023.
 
@@ -755,7 +755,7 @@ ef_vals_pops |>
   theme(legend.position = c(0.25, 0.75))
 ```
 
-This example illustrates how **hatchR** can be used to explore the intersection of developmental plasticity and local adaptation using real-world data. Such applications are useful for disentangling the genetic basis of thermal sensitivity, anticipating geographic responses to climate change, and informing population-specific management strategies.
+This example illustrates how **hatchR** can be used to explore the intersection of developmental plasticity and local adaptation using real-world data. Such applications are useful for disentangling the genetic basis of thermal sensitivity, anticipating geographic responses to changing environments, and informing population-specific management strategies.
 
 # Discussion
 
@@ -771,6 +771,6 @@ Given the wide potential applicability of **hatchR**, we especially emphasize it
 
 # Conclusion
 
-Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of climate change. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
+Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of variable climates. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
 
 # Bibliography
