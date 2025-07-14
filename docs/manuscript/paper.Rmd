@@ -3,6 +3,7 @@ title: ""
 output:  
   bookdown::pdf_document2:
     toc: false
+    number_sections: false
 header-includes:
    - \usepackage{lineno}
    - \linenumbers
@@ -117,9 +118,9 @@ p1 + p2 + plot_annotation(tag_levels = 'A')
 
 ## Data input and quality checks
 
-**hatchR** requires two core inputs: a vector of daily average water temperatures and a corresponding vector of calendar dates. These data are typically collected from field-deployed temperature loggers. For loggers that record sub-daily temperatures, **hatchR** includes the function `summarize_temp()` to compute daily means. Data completeness and consistency can be checked using `plot_check_temp()` and `check_continuous()` to ensure there are no gaps or anomalies in the temperature record (Table \@ref(tab:eg-temp-data)).
+**hatchR** requires two core inputs: a vector of daily average water temperatures and a corresponding vector of calendar dates. These data are typically collected from field-deployed temperature loggers. For loggers that record sub-daily temperatures, **hatchR** includes the function `summarize_temp()` to compute daily means. Data completeness and consistency can be checked using `plot_check_temp()` and `check_continuous()` to ensure there are no gaps or anomalies in the temperature record.
 
-```{r eg-temp-data}
+```{r eg-temp-data, eval=FALSE}
 df <- data.frame(
   date = c(
     "2024-01-01",
@@ -149,14 +150,12 @@ If you import data from raw files with multiple daily readings, the package allo
 
 Developmental phenology can be predicted in two ways using hatchR. The `predict_phenology()` function estimates the date at which development completes, given a known reproductive event (e.g., oviposition or spawning; `spawn.date`) and daily temperature data. Alternatively, the `predict_spawn()` function works in reverse—estimating the likely date of a reproductive event based on a known or observed hatch/emergence date. This is especially useful for retrospective analyses or for estimating breeding windows from field observations.
 
-**BMM NOTE: Seems like we should include a figure of output here. Could just add a panel to figure 1 with days to develop plot.**
-
 # Case studies
 
 The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. Below, we provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature. These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span seven taxonomic classes—amphibians, reptiles, insects, crustaceans, copepods, cephalopods, and asteroids (starfishes) —and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
 
 | Class | Order | Genus | Species | Study |
-|:---|:---|:---|:---|:---|
+|:--------------|:--------------|:--------------|:--------------|:--------------|
 | Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
 |  |  |  | *L. pipiens* |  |
 |  |  |  | *L. clamitans* |  |
