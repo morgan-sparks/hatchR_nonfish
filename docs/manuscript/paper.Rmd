@@ -63,7 +63,7 @@ $$
 
 where *i* is the index for each day, *a* and *b* are empirically derived parameters, and temperature is the average for that day. Development is complete once the cumulative sum of daily effective values reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
 
-To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure \@ref(fig:tail-frog)). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data (**CITE**). While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions.
+To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure \@ref(fig:tail-frog)). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data @. While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions.
 
 ```{r tail-frog, fig.width=8, fig.height=3, fig.align='center', fig.cap="Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference."}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
@@ -163,8 +163,8 @@ The effective value modeling framework is broadly applicable across poikilotherm
 |  |  | *Ascaphus* | *A. truei* | @brown1975 |
 |  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
 | Reptilia | Squamata | *Sceloporus* | *S. undulatus* | @angilletta2000 |
-|  |  | *Podarcis* | *P. mural*is | @vandamme1992 |
-|  | Testudines | *Mauremys* | M. reevesii | @du2007 |
+|  |  | *Podarcis* | *P. muralis* | @vandamme1992 |
+|  | Testudines | *Mauremys* | *M. reevesii* | @du2007 |
 |  |  |  | 181 species | 141 studies in @while2018 |
 | Insecta | Plecoptera | *Nemurella* | *N. pictetii* | @brittain1978, @elliott1984 |
 |  |  | *Capnia* | *C. atra* | @brittain1984 |
