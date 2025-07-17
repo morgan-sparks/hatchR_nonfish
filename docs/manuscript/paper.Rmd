@@ -81,7 +81,7 @@ $$
 
 where *i* is the index for each day, *a* and *b* are empirically derived parameters, and temperature is the average for that day. Development is complete once the cumulative sum of daily effective values reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
 
-To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure 1). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data \@. While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions.
+To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure 1). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data. While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions.
 
 ```{r tail-frog}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
@@ -164,7 +164,7 @@ knitr::kable(df,
 )
 ```
 
-If you import data from raw files with multiple daily readings, the package allows you to summarize your with `summarize_temp()` and then check summarized data with the `plot_check_temp()` and `check_continuous()` functions.
+If you import data from raw files with multiple daily readings, the package allows you to summarize your data with `summarize_temp()` and then check summarized data with the `plot_check_temp()` and `check_continuous()` functions.
 
 ## Predicting phenology
 
@@ -172,7 +172,7 @@ Developmental phenology can be predicted in two ways using hatchR. The `predict_
 
 # Case studies
 
-The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. Below, we provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature. These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span seven taxonomic classes—amphibians, reptiles, insects, crustaceans, copepods, cephalopods, and asteroids (starfishes) —and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
+The effective value modeling framework is broadly applicable across poikilothermic taxa and can be used to address a wide array of ecological, evolutionary, and management questions. While this manuscript focuses on three illustrative case studies, many additional opportunities exist. We provide a non-exhaustive compilation of species for which thermal developmental data are available in the peer-reviewed or grey literature (Table 1). These sources can be used to parameterize custom models via the `fit_model()` function in **hatchR**, allowing users to build tailored effective value models for diverse taxa. The examples span seven taxonomic classes—amphibians, reptiles, insects, crustaceans, copepods, cephalopods, and asteroids (starfishes) —and demonstrate the breadth of systems to which this approach can be applied. While the case studies we present here are intended as proof-of-concept, we anticipate that applications will continue to expand alongside the growing availability of temperature–development datasets.
 
 ```{r, eval=FALSE}
 
@@ -196,7 +196,7 @@ tax_names |>
 
 ## Ecological Application: Spatial and Temporal Trends in Development
 
-Examining variation in development across space and time is critical to understand how organisms respond to ecological factors such as climate change [@pinsky2019]. Here, we first demonstrate an application of hatchR to predict hatching times from a spatio-temporally extensive dataset. Using these predictions, we then show how one can examine putative drivers of variation in development and discuss their application in forecasting future responses.
+Examining variation in development across space and time is critical to understand how organisms respond to ecological factors such as variable climates [@pinsky2019]. Here, we first demonstrate an application of hatchR to predict hatching times from a spatio-temporally extensive dataset. Using these predictions, we then show how one can examine putative drivers of variation in development and discuss their application in forecasting future responses.
 
 We modeled variation in developmental timing for coastal tailed frogs (*A. truei*) across their range in the Pacific Northwest. Using oviposition estimates from @karraker2006 (unpublished data) and our earlier parameterized effective value model (Figure 1), we simulated daily development across 30 years (1991-2020) using modeled stream temperature data from @siegel2023.
 
@@ -740,7 +740,7 @@ fig4 <- ef_vals_pops |>
 ggsave("./figures/Figure_4.pdf", fig4, height = 4, width = 8, units = "in", dpi = 1000)
 ```
 
-This example illustrates how **hatchR** can be used to explore the intersection of developmental plasticity and local adaptation using real-world data. Such applications are useful for disentangling the genetic basis of thermal sensitivity, anticipating geographic responses to climate change, and informing population-specific management strategies.
+This example illustrates how **hatchR** can be used to explore the intersection of developmental plasticity and local adaptation using real-world data. Such applications are useful for disentangling the genetic basis of thermal sensitivity, anticipating geographic responses to changing temperatures, and informing population-specific management strategies.
 
 # Discussion
 
@@ -756,7 +756,7 @@ Given the wide potential applicability of **hatchR**, we especially emphasize it
 
 # Conclusion
 
-Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of climate change. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
+Although initially developed for fishes, **hatchR** is a broadly applicable tool for modeling temperature-dependent development in poikilotherms. It addresses key limitations of traditional degree-day approaches by accounting for non-linear thermal response curves and enabling predictions under fluctuating thermal conditions. As global temperatures rise and the phenology of organisms shifts in response, tools like **hatchR** will be increasingly valuable for anticipating the ecological and evolutionary consequences of variable climates. While we provide numerous species-level parameterizations and demonstrate a set of representative case studies, the full range of possible applications—across taxa, ecosystems, and educational settings—extends far beyond what we present here.
 
 # Acknowledgements
 
