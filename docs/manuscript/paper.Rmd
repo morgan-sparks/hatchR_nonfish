@@ -19,7 +19,7 @@ Morgan M. Sparks^1,3^, Brian C. Leavell^2^, Bryan M. Maitland^1^
 
 ^1^Rocky Mountain Research Station, U.S. Forest Service, Boise, Idaho, USA
 
-^2^Smithsonian Tropical Research Institute, Apartado, Balboa, Ancón, Panamá
+^2^Smithsonian Tropical Research Institute, Balboa, Ancón, Panamá
 
 ^3^Corresponding author, [Morgan.Sparks\@usda.gov](mailto:Morgan.Sparks@usda.gov){.email}
 
