@@ -53,7 +53,7 @@ library(taxize)
 
 # Abstract
 
-Development in poikilothermic organisms is strongly temperature-dependent, particularly during early life stages prior to exogenous feeding. This thermally constrained physiology produces a near-mechanistic relationship between ambient temperature and developmental rate, allowing for predictive models of phenology. However, traditional models—often developed under constant laboratory temperatures—struggle to account for the variable thermal regimes experienced by wild populations. Effective value models were created to address this issue and are a framework that integrates daily temperature data to predict developmental timing under fluctuating conditions. Building on this foundation, the R package **hatchR** was developed for fishes to operationalize the effective value model and enable its widespread application. In this paper, we expand the scope of **hatchR**, demonstrating its applicability across a broad range of poikilothermic taxa, including amphibians, reptiles, and aquatic invertebrates. We also illustrate how this framework supports both applied management goals—such as predicting hatching windows for conservation and monitoring—and basic research on ecological and evolutionary questions, including phenological plasticity, thermal adaptation, and life history strategies. By providing a generalizable, open-source tool, **hatchR** bridges the gap between physiological theory and real-world application, offering a robust platform for predicting developmental phenology in diverse and changing environments.
+Development in poikilothermic organisms is strongly temperature-dependent, particularly during early life stages prior to exogenous feeding. This thermally constrained physiology produces a near-mechanistic relationship between ambient temperature and developmental rate, allowing for predictive models of phenology. However, traditional models—often developed under constant laboratory temperatures—struggle to account for the variable thermal regimes experienced by wild populations. Effective value models were created to address this issue and are a framework that integrates daily temperature data to predict developmental timing under fluctuating conditions. Building on this foundation, the R package **hatchR** was developed for fishes to operationalize the effective value model and enable its widespread application. In this paper, we expand the scope of **hatchR**, demonstrating its applicability across a broad range of poikilothermic taxa including amphibians, reptiles, insects, crustaceans, copepods, and starfishes. We also illustrate how this framework supports both applied management goals—such as predicting hatching windows for conservation and monitoring—and basic research on ecological and evolutionary questions, including phenological plasticity, thermal adaptation, and ecological interactions. By providing a generalizable, open-source tool, **hatchR** bridges the gap between physiological theory and real-world application, offering a robust platform for predicting developmental phenology in diverse and changing environments.
 
 \newpage
 
@@ -81,7 +81,7 @@ $$
 
 where *i* is the index for each day, *a* and *b* are empirically derived parameters, and temperature is the average for that day. Development is complete once the cumulative sum of daily effective values reaches one: $$\sum_{i =1}^nEffectiveValue_i = 1$$
 
-To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure \@ref(fig:tail-frog)). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data \@. While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions.
+To illustrate this process, we developed a custom effective value model for the coastal tailed frog (*Ascaphus truei*), a cold-adapted amphibian widespread in forested streams of western North America (Figure 1). We used **hatchR**'s `fit_model()` function, which fits power-law models (specifically, Model 2 following @beacham1990) to thermal performance data \@. While **hatchR** defaults to the power-law framework, users may supply any model formulation via the `predict_phenology()` function, enabling flexibility for taxa or traits that require alternative temperature-development functions.
 
 ```{r tail-frog}
 # Brown 1975, Comparitive Biochemistry and Physicology Part A: Physiology
@@ -198,7 +198,7 @@ tax_names |>
 
 Examining variation in development across space and time is critical to understand how organisms respond to ecological factors such as climate change [@pinsky2019]. Here, we first demonstrate an application of hatchR to predict hatching times from a spatio-temporally extensive dataset. Using these predictions, we then show how one can examine putative drivers of variation in development and discuss their application in forecasting future responses.
 
-We modeled variation in developmental timing for coastal tailed frogs (*A. truei*) across their range in the Pacific Northwest. Using oviposition estimates from @karraker2006 (unpublished data) and our earlier parameterized effective value model (Figure \@ref(fig:tail-frog)), we simulated daily development across 30 years (1991-2020) using modeled stream temperature data from @siegel2023.
+We modeled variation in developmental timing for coastal tailed frogs (*A. truei*) across their range in the Pacific Northwest. Using oviposition estimates from @karraker2006 (unpublished data) and our earlier parameterized effective value model (Figure 1), we simulated daily development across 30 years (1991-2020) using modeled stream temperature data from @siegel2023.
 
 ```{r tail-frog-pheno}
 # Read data
@@ -323,7 +323,7 @@ perf <- performance::compare_performance(
 params <- parameters::model_parameters(m2)
 ```
 
-This model explained \~`r round(perf[1,4], 2)*100`% of the variation in developmental timing (adjusted R² = `r round(perf[1,4], 3)`), with year having a significant weak and negative effect (`r round(params[2,2], 2)` days/year, p = 0.001), indicating an overall trend toward faster development consistent with regional warming (Figure \@ref(fig:frog-preds)A). COMID effects captured the persistent differences in thermal regimes among streams, with estimated marginal means ranging from \~15 to \~44 days to hatch across sites (Figure \@ref(fig:frog-preds)B).
+This model explained \~`r round(perf[1,4], 2)*100`% of the variation in developmental timing (adjusted R² = `r round(perf[1,4], 3)`), with year having a significant weak and negative effect (`r round(params[2,2], 2)` days/year, p = 0.001), indicating an overall trend toward faster development consistent with regional warming (Figure 2A). COMID effects captured the persistent differences in thermal regimes among streams, with estimated marginal means ranging from \~15 to \~44 days to hatch across sites (Figure 2B).
 
 ```{r frog-preds, fig.height=3 , fig.width=8, fig.align='center', fig.cap=""}
 
@@ -338,7 +338,7 @@ p.01 <- means_all |>
   ggplot(aes(year, Mean, ymin = CI_low, ymax = CI_high)) +
   geom_ribbon(alpha = 0.05, color = NA) +
   geom_line(size = 1.1)  +
-  lims(y = c(20,27)) +
+  lims(y = c(12,46)) +
   labs(x = "Year", y = "Mean of Days to Hatch") +
   theme_classic(base_size = 16)
 
@@ -364,10 +364,11 @@ p.02 <- means |>
   ) +
   geom_line(size = 1.1) +
   geom_ribbon(alpha = 0.05, color = NA) +
+  lims(y = c(12,46)) +
   labs(x = "Year", y = "Mean of Days to Hatch") +
   theme_classic(base_size = 16)
 
-fig2 <- p.01 + p.02 + plot_annotation(tag_levels = 'A', title = "Figure 2")
+fig2 <- p.01 + p.02 + plot_annotation(tag_levels = 'A', title = "Figure 2") 
 
 ggsave("./figures/Figure_2.pdf", fig2, height = 4, width = 8, units = "in", dpi = 1000)
 
@@ -431,7 +432,7 @@ ascaphus_siegel_data <- rbind(ascaphus_siegel_data, huc_10_df)
 write_rds( ascaphus_siegel_data, "../../data/ascaphus_siegel_data.rds", compress = "gz" )
 ```
 
-## Phylogenetic Application: Species Differences in Developmental Rates / Reaction Norms
+## Phylogenetic Application: Species Differences in Developmental Rates
 
 Closely related species often diverge in their thermal tolerances and developmental strategies as part of niche differentiation. These differences can be visualized through reaction norms that capture genotype-by-environment (G×E) interactions, often derived from common garden or reciprocal transplant experiments. While such experiments are ideal for isolating genetic and plastic components of trait variation, they are logistically demanding and rarely available for many taxa.
 
@@ -439,7 +440,7 @@ Closely related species often diverge in their thermal tolerances and developmen
 
 To demonstrate this approach, we leveraged data from @moore1939 to parameterize developmental models for four widely distributed North American frog species in the genus *Lithobates*: wood frog (*L. sylvaticus*), pickerel frog (*L. palustris*), northern leopard frog (*L. pipiens*), and green frog (*L. clamitans*). These species co-occur in parts of eastern North America but differ in their breeding phenology, habitat associations, and thermal niches. For example, wood frogs are early breeders in cold, ephemeral wetlands, while green frogs breed later in more permanent, warmer waters.
 
-We applied the custom parameterized models to two hypothetical spring temperature regimes with mean daily temperatures of 16 °C (cool) and 24 °C (warm). Under the cool regime, wood frogs hatched earliest while green frogs lagged behind by up to eight days—nearly double the developmental duration (Figure \@ref(fig:litho-pheno)A). However, under the warm regime, predicted hatch dates clustered tightly, with all species hatching within one day of each other (Figure \@ref(fig:litho-pheno)B). The effective value slopes (Figure \@ref(fig:litho-pheno)C) reveal these underlying differences in developmental response curves, serving as species-specific linearized reaction norms. Notably, the rank order of developmental timing in green frogs reverses across the two thermal regimes, a hallmark of strong G×E interaction.
+We applied the custom parameterized models to two hypothetical spring temperature regimes with mean daily temperatures of 16 °C (cool) and 24 °C (warm). Under the cool regime, wood frogs hatched earliest while green frogs lagged behind by up to eight days—nearly double the developmental duration (Figure 3A). However, under the warm regime, predicted hatch dates clustered tightly, with all species hatching within one day of each other (Figure 3B). The effective value slopes (Figure 3C) reveal these underlying differences in developmental response curves, serving as species-specific linearized reaction norms. Notably, the rank order of developmental timing in green frogs reverses across the two thermal regimes, a hallmark of strong G×E interaction.
 
 ```{r litho-pheno, fig.height=8 , fig.width=8, fig.align='center', fig.cap=""}
 ### all the Rana's below refer to taxonomy from the paper, they are now genus Lithobates
@@ -572,7 +573,7 @@ p2.1.a <- ggplot() +
   labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
   theme_classic(base_size = 16) +
-  theme(legend.position = c(0.75, 0.25))
+  theme(legend.position = "none")
 
 # run for temp 24 C
 set.seed(123)
@@ -656,7 +657,7 @@ p2.2 <- ef_vals |>
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   scale_color_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
   theme_classic(base_size = 16) +
-  theme(legend.position = "none")
+  theme(legend.position = c(0.2,0.8))
 
 fig3 <- (p2.1.a + p2.1.b) / p2.2 + plot_annotation(tag_levels = "A", title = "Figure 3")
 
@@ -671,7 +672,7 @@ As with interspecific comparisons, developmental models can be parameterized at 
 
 Here, we used data from a common garden experiment on cabbage beetles (*Colaphellus bowringi*) reared at six constant temperatures (16–28 °C), spanning populations collected along a \~3,440 km latitudinal gradient in China [@tang2017]. Although all beetles were reared under identical conditions, developmental rates differed among populations, particularly at cooler temperatures. Populations from southern latitudes—where temperatures are generally warmer—developed more quickly than northern populations, a pattern consistent with cogradient variation, where genetic and environmental effects on a phenotype act in the same direction [@conover2009; @sparks2022].
 
-To visualize these patterns, we fit custom effective value models for five of the six populations (excluding Longnan, which duplicated the values from Xiushui). The resulting linearized effective value curves (Figure \@ref(fig:beetles)) show that beetles from Xiushui County (southernmost) had consistently faster development rates across temperatures than their more northerly counterparts. These differences are especially pronounced at cooler temperatures, suggesting that local adaptation may only manifest under certain environmental conditions. Moreover, the consistent rank order of developmental rates across the populations indicates heritable differences among populations which have and can continue to be selected upon in changing environments.
+To visualize these patterns, we fit custom effective value models for five of the six populations (excluding Longnan, which duplicated the values from Xiushui). The resulting linearized effective value curves (Figure 4) show that beetles from Xiushui County (southernmost) had consistently faster development rates across temperatures than their more northerly counterparts. These differences are especially pronounced at cooler temperatures, suggesting that local adaptation may only manifest under certain environmental conditions. Moreover, the consistent rank order of developmental rates across the populations indicates heritable differences among populations which have and can continue to be selected upon in changing environments.
 
 ```{r beetles, fig.height=3 , fig.width=5, fig.align='center', fig.cap=""}
 tang_temps <- c(16, 19, 22, 24, 26, 28)
@@ -780,10 +781,7 @@ The authors declare no known conflicts of interest.
 
 | Class | Order | Genus | Species | Study |
 |:--------------|:--------------|:--------------|:--------------|:--------------|
-| Amphibia | Anura | *Lithobates* | *L. sylvaticus* | @moore1939 |
-|  |  |  | *L. pipiens* |  |
-|  |  |  | *L. clamitans* |  |
-|  |  |  | *L. palustris* |  |
+| Amphibia | Anura | *Lithobates* | *L. sylvaticus, L. pipiens, L. clamitans, L. palustris* | @moore1939 |
 |  |  | *Ascaphus* | *A. truei* | @brown1975 |
 |  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
 | Reptilia | Squamata | *Sceloporus* | *S. undulatus* | @angilletta2000 |
@@ -796,7 +794,10 @@ The authors declare no known conflicts of interest.
 |  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
 |  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
 |  | Coleoptera | *Colaphellus* | *C. bowringi* | @tang2017 |
-|  |  |  | 18 species | Developmental equations in @pritchard1987 |
+|  | Odonata | 7 genera | 14 species | Developmental equations in @pritchard1987 |
+|  | Culicidae | *Aedes* | *A. sticticus, A. vexans* |  |
+|  |  | Anopheles | *A. quadrimaculatus* |  |
+|  |  | *Toxorhynchites* | *T. brevipalpis* |  |
 | Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
 | Copepoda | Calanoida | 10 genera | 28 species | @forster2011 |
 |  | Cyclopoida | *Limnoithona* | *L. tetraspina* |  |
@@ -804,55 +805,51 @@ The authors declare no known conflicts of interest.
 |  | Harpacticoida | *Microsetella* | *M. norvegica* |  |
 |  |  | *Mesochra* | *M.lilljeborgi* |  |
 |  | Poecilostomatoida | *Oncaea* | *O. venusta* |  |
-| Cephalopoda | Octopoda | *Octopus* | *O. vulgaris* | @márquez2021 |
-|  |  |  | *O. mimus* |  |
-|  | Myopsida | *Loligo* | *L. vulgaris* |  |
-|  |  |  | *L. reynaudii* |  |
-|  | Oegopsida | *Illex* | *I. coindetii* |  |
-|  |  |  | *I. illecebrosus* |  |
+| Cephalopoda | Octopoda | *Octopus* | *O. vulgaris, O. mimus* | @márquez2021 |
+|  | Myopsida | *Loligo* | *L. vulgaris, L. reynaudii* |  |
+|  | Oegopsida | *Illex* | *I. coindetii, I. illecebrosus* |  |
 |  |  | *Todarodes* | *T.pacificus* |  |
 |  |  | *Ommastrephes* | *O. bartramii* |  |
-| Asteroidea | Valvatida | *Odontaster* | *O. meridionalis* | @hoegh-guldberg1995 |
-|  |  |  | *O. validus* |  |
+| Asteroidea | Valvatida | *Odontaster* | *O. meridionalis, O. validus* | @hoegh-guldberg1995 |
 |  |  | *Asterina* | *A. miniata* |  |
 |  |  | *Acanthaster* | *A. planci* |  |
 
-: Example sources for effective value parameterization using `fit_model()` in **hatchR.** This compilation spans amphibians, reptiles, aquatic and terrestrial insects, crustaceans, copepods, squids and octopuses, and starfishes. Some entries, such as @while2018 and @pritchard1987, represent broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
+: Putative sources for effective value parameterization using `fit_model()` in **hatchR.** This compilation spans amphibians, reptiles, aquatic and terrestrial insects, crustaceans, copepods, squids and octopuses, and starfishes. @while2018 and @pritchard1987 are broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
 
 \newpage
 
 # Figure Captions
 
-Figure 1: Custom hatching phenology model for coastal tailed frogs (Ascaphus truei).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference.
+Figure 1: Custom hatching phenology model for coastal tailed frogs (*Ascaphus truei*).Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference.
 
-Figure 2: Modeled changes in developmental timing for coastal tailed frogs (Ascaphus truei) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals.
+Figure 2: Modeled changes in developmental timing for coastal tailed frogs (*Ascaphus truei*) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals.
 
 Figure 3: Custom hatch timing models developed for four North American *Lithobates* frog species. Models are parameterized from @moore1939 and phenology is predicted using two synthetic temperature regimes: Panel A shows predictions under a cooler regime (mean = 16 °C), while Panel B shows predictions under a warmer regime (mean = 24 °C). Panel C displays the effective value curves for each species—linearized approximations of thermal reaction norms. The crossover in rank order between Panels A and B illustrates genotype-by-environment interactions, reflecting species-specific thermal niches and breeding strategies.
 
-Figure 4: Effective value models for five populations of cabbage beetles (Colaphellus bowringi, females) along a latitudinal gradient in China [@tang2017]. Models were parameterized from common garden experiments under constant temperatures. The southernmost population (Xiushui County) shows a consistently faster developmental rate than populations from more northerly sites, especially at colder temperatures. This pattern is indicative of cogradient variation, where both genetic and environmental effects reinforce the observed phenotypic trend.
+Figure 4: Effective value models for five populations of cabbage beetles (*Colaphellus bowringi*, females) along a latitudinal gradient in China [@tang2017]. Models were parameterized from common garden experiments under constant temperatures. The southernmost population (Xiushui County) shows a consistently faster developmental rate than populations from more northerly sites, especially at colder temperatures. This pattern is indicative of cogradient variation, where both genetic and environmental effects reinforce the observed phenotypic trend.
 
 \newpage
 
 # Figures
 
-```{r  fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
+```{r fig-1,  fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
 fig1
 ```
 
 \newpage
 
-```{r fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
+```{r fig-2, fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
 fig2
 ```
 
 \newpage
 
-```{r fig.width=8, fig.height=10, fig.align='center', fig.cap=""}
+```{r fig-3, fig.width=8, fig.height=8, fig.align='center', fig.cap=""}
 fig3
 ```
 
 \newpage
 
-```{r fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
+```{r fig-4, fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
 fig4
 ```
