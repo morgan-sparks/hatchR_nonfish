@@ -129,7 +129,7 @@ p2 <- ascaphus_ef |>
   geom_line(data = data_1, aes(x = t, y = e), linetype = "dashed") +
   # geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
-  theme_classic()
+  theme_classic(base_size = 16)
 
 fig1 <- p1 + p2 + plot_annotation(tag_levels = 'A', title = "Figure 1")
 
@@ -264,7 +264,7 @@ model_data <- pred_hatch |>
 # model_data |>
 #   ggplot() +
 #   geom_density_ridges(aes(y = as.factor(year), x = days , fill = Mountain)) +
-#   theme_classic() +
+#   theme_classic(base_size = 16) +
 #   theme(legend.position = "none")
 # 
 # model_data |>
@@ -273,7 +273,7 @@ model_data <- pred_hatch |>
 #   #geom_line() +
 #   geom_smooth(method = "lm", se = FALSE) +
 #   labs(x= "Year", y = "Hatch Date") +
-#   theme_classic() +
+#   theme_classic(base_size = 16) +
 #   theme(legend.position = c(0.8, 0.75))
 
 model_data <- model_data |> 
@@ -340,7 +340,7 @@ p.01 <- means_all |>
   geom_line(size = 1.1)  +
   lims(y = c(20,27)) +
   labs(x = "Year", y = "Mean of Days to Hatch") +
-  theme_classic()
+  theme_classic(base_size = 16)
 
 means <- estimate_means(m2, c("year", "comid"), preserve_range = TRUE) |> 
   tibble() |>
@@ -365,7 +365,7 @@ p.02 <- means |>
   geom_line(size = 1.1) +
   geom_ribbon(alpha = 0.05, color = NA) +
   labs(x = "Year", y = "Mean of Days to Hatch") +
-  theme_classic()
+  theme_classic(base_size = 16)
 
 fig2 <- p.01 + p.02 + plot_annotation(tag_levels = 'A', title = "Figure 2")
 
@@ -375,7 +375,7 @@ ggsave("./figures/Figure_2.pdf", fig2, height = 4, width = 8, units = "in", dpi 
 #   plot() +
 #   #geom_point(data = pred_hatch, aes(x = year, y = days, color = Mountain), size = 0.5 , alpha = 0.25) +
 #   labs(x = "Year", y = "Mean of Days to Hatch") +
-#   theme_classic()
+#   theme_classic(base_size = 16)
 ```
 
 Our results indicate developmental rates were highly variable over different physical habitats (streams originating in lowland hills compared with those originating in mountain ranges with permanent snow fields), with sites in Olympic National Park consistently having the longest development times and the greatest interannual variability (SD \~ 11 days), while lowland streams in the Willapa Hills developed fastest with minimal variability (SD \< 3 days). These results demonstrate the capacity of **hatchR** to detect spatiotemporal phenological variation and forecast potential shifts under shifting climate patterns.
@@ -571,7 +571,7 @@ p2.1.a <- ggplot() +
   geom_label(data = froggy_hatch_cold, aes(x = start + (stop - start) / 1.45, y = (index - 0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
-  theme_classic() +
+  theme_classic(base_size = 16) +
   theme(legend.position = c(0.75, 0.25))
 
 # run for temp 24 C
@@ -618,7 +618,7 @@ p2.1.b <- ggplot() +
   geom_label(data = froggy_hatch_warm, aes(x = start + (stop - start) / 1.45, y = (index - 0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
-  theme_classic() +
+  theme_classic(base_size = 16) +
   theme(legend.position = "none")
 
 ### Figure B code
@@ -655,7 +655,7 @@ p2.2 <- ef_vals |>
   geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   scale_color_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
-  theme_classic() +
+  theme_classic(base_size = 16) +
   theme(legend.position = "none")
 
 fig3 <- (p2.1.a + p2.1.b) / p2.2 + plot_annotation(tag_levels = "A", title = "Figure 3")
@@ -733,7 +733,7 @@ fig4 <- ef_vals_pops |>
   # geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value", title = "Figure 4") +
   scale_color_brewer(palette = "Dark2", name = "Beetle Populations") +
-  theme_classic() +
+  theme_classic(base_size = 16) +
   theme(legend.position = c(0.25, 0.75))
 
 ggsave("./figures/Figure_4.pdf", fig4, height = 4, width = 8, units = "in", dpi = 1000)
@@ -847,7 +847,7 @@ fig2
 
 \newpage
 
-```{r fig.width=8, fig.height=8, fig.align='center', fig.cap=""}
+```{r fig.width=8, fig.height=10, fig.align='center', fig.cap=""}
 fig3
 ```
 
