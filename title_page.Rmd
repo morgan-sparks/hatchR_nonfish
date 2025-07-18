@@ -29,7 +29,7 @@ We thank N. Karraker, D. Pilliod, M. Hayes, R.B. Bury, and B. Norman for their h
 
 ## Data Availability
 
-**hatchR** is an open-source software environment distributed via CRAN and additional details hosted at software website (<https://bmait101.github.io/hatchR/>). Reproducible methods for this manuscript are available at the manuscript github (<https://github.com/morgan-sparks/hatchR_nonfish>) in the `paper.Rmd` file. The repository will become public and publicly archived with a DOI at acceptance of the manuscript.
+**hatchR** is an open-source software environment distributed via CRAN and additional details are hosted at software website (<https://bmait101.github.io/hatchR/>). Reproducible methods for this manuscript are available at the manuscript github (<https://github.com/morgan-sparks/hatchR_nonfish>) in the `paper.Rmd` file. The repository will become public and publicly archived with a DOI at acceptance of the manuscript.
 
 ## Conflict of interest
 
