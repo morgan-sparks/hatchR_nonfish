@@ -27,7 +27,7 @@ Journal: Ecology Applications
 
 Type: Method
 
-keywords: developmental phenology, hatchR, local adaptation, R, reaction norm, Shiny
+keywords: developmental phenology; hatchR; local adaptation,;R, reaction norm; Shiny
 
 ### Open Research Policy
 
@@ -118,7 +118,8 @@ lab1 <- sprintf(fmt, ascaphus_mod$r_squared)
 p1 <- ascaphus_mod$pred_plot +
   labs(x = "Incubation Temperature (°C)", y = "Days to Hatch") +
   lims(y = c(0, 50)) +
-  annotate("text", x = 10, y = c(35), label = c(lab1),  hjust = 0, parse = TRUE)
+  annotate("text", x = 10, y = c(35), label = c(lab1),  hjust = 0, parse = TRUE) +
+  theme_classic(base_size = 16)
 
 data_1 <- tibble(t = c(0:20), e = seq(0, 0.20, by = 0.01))
 
@@ -814,7 +815,7 @@ The authors declare no known conflicts of interest.
 |  |  | *Asterina* | *A. miniata* |  |
 |  |  | *Acanthaster* | *A. planci* |  |
 
-: Putative sources for effective value parameterization using `fit_model()` in **hatchR.** This compilation spans amphibians, reptiles, aquatic and terrestrial insects, crustaceans, copepods, squids and octopuses, and starfishes. @while2018 and @pritchard1987 are broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
+: Putative sources for effective value parameterization using `fit_model()` in **hatchR** for a broad array of taxa**.** @while2018 and @pritchard1987 are broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
 
 \newpage
 
