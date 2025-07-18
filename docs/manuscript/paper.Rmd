@@ -31,7 +31,7 @@ keywords: developmental phenology, hatchR, local adaptation, R, reaction norm, S
 
 ### Open Research Policy
 
-**hatchR** is an open-source software environment distributed via CRAN and additional details are hosted at software website (<https://bmait101.github.io/hatchR/>). Reproducible methods for this manuscript are available at the manuscript github (<https://github.com/morgan-sparks/hatchR_nonfish>) in the `paper.Rmd` file. The repository will become public and publicly archived with a DOI at acceptance of the manuscript.
+**hatchR** is an open-source software environment distributed via CRAN and additional details are hosted at software website (<https://bmait101.github.io/hatchR/>). Reproducible methods for this manuscript are available at the manuscript github (<https://github.com/morgan-sparks/hatchR_nonfish>) in the `paper.Rmd` file. The repository will become publicly archived with a DOI at acceptance of the manuscript.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
