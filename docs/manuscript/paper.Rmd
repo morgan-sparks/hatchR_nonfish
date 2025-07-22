@@ -14,7 +14,7 @@ csl: ecological-applications.csl
 bibliography: references.bib
 ---
 
-# A generalizable tool for predicting developmental phenology for wild poikilotherms.
+# A generalizable tool for predicting developmental phenology for wild poikilotherms
 
 Morgan M. Sparks^1,3^, Brian C. Leavell^2^, Bryan M. Maitland^1^
 
@@ -28,7 +28,7 @@ Journal: Ecology Applications
 
 Type: Method
 
-keywords: developmental phenology; hatchR; local adaptation,;R, reaction norm; Shiny
+keywords: developmental phenology; hatchR; local adaptation; R; reaction norm; Shiny
 
 ### Open Research Policy
 
@@ -118,7 +118,7 @@ fmt <- "~R^2 ==  %.4f"
 lab1 <- sprintf(fmt, ascaphus_mod$r_squared)
 p1 <- ascaphus_mod$pred_plot +
   labs(x = "Incubation Temperature (°C)", y = "Days to Hatch") +
-  lims(y = c(0, 50)) +
+  lims(y = c(0, 50), x =c(5,20)) +
   annotate("text", x = 10, y = c(35), label = c(lab1),  hjust = 0, parse = TRUE) +
   theme_classic(base_size = 16)
 
@@ -572,7 +572,7 @@ p2.1.a <- ggplot() +
   geom_label(data = froggy_hatch_cold, aes(x = start + (stop - start) / 1.45, y = (index - 0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 14) +
   theme(legend.position = "none")
 
 # run for temp 24 C
@@ -619,7 +619,7 @@ p2.1.b <- ggplot() +
   geom_label(data = froggy_hatch_warm, aes(x = start + (stop - start) / 1.45, y = (index - 0.325), label = days_to_develop)) +
   labs(x = "Date", y = "Temperature (°C)") +
   scale_fill_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 14) +
   theme(legend.position = "none")
 
 ### Figure B code
@@ -656,7 +656,7 @@ p2.2 <- ef_vals |>
   geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
   labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   scale_color_manual(values = c("darkolivegreen4", "deepskyblue4", "grey23", "purple4"), name = "Species") +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 14) +
   theme(legend.position = c(0.2,0.8))
 
 fig3 <- (p2.1.a + p2.1.b) / p2.2 + plot_annotation(tag_levels = "A", title = "Figure 3")
@@ -730,10 +730,12 @@ fig4 <- ef_vals_pops |>
   geom_line() +
   geom_point() +
   # geom_abline(intercept = 0, slope = .01, linetype = "dashed") +
-  labs(x = "Daily Average Temperature (°C)", y = "Effective Value", title = "Figure 4") +
+  labs(x = "Daily Average Temperature (°C)", y = "Effective Value") +
   scale_color_brewer(palette = "Dark2", name = "Beetle Populations") +
   theme_classic(base_size = 16) +
   theme(legend.position = c(0.25, 0.75))
+
+fig4 <- fig4 + plot_annotation(title = "Figure 4")
 
 ggsave("./figures/Figure_4.pdf", fig4, height = 4, width = 8, units = "in", dpi = 1000)
 ```
@@ -779,38 +781,38 @@ The authors declare no known conflicts of interest.
 
 | Class | Order | Genus | Species | Study |
 |:--------------|:--------------|:--------------|:--------------|:--------------|
-| Amphibia | Anura | *Lithobates* | *L. sylvaticus, L. pipiens, L. clamitans, L. palustris* | @moore1939 |
-|  |  | *Ascaphus* | *A. truei* | @brown1975 |
+| Amphibia | Anura | *Ascaphus* | *A. truei* | @brown1975 |
+|  |  | *Lithobates* | *L. clamitans, L. palustris, L. pipiens, L. sylvaticus* | @moore1939 |
 |  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
-| Reptilia | Squamata | *Sceloporus* | *S. undulatus* | @angilletta2000 |
-|  |  | *Podarcis* | *P. muralis* | @vandamme1992 |
-|  | Testudines | *Mauremys* | *M. reevesii* | @du2007 |
-|  |  |  | 181 species | 141 studies in @while2018 |
-| Insecta | Plecoptera | *Nemurella* | *N. pictetii* | @brittain1978, @elliott1984 |
-|  |  | *Capnia* | *C. atra* | @brittain1984 |
-|  |  | *Capnia* | *C. bifrons* | @elliott1986 |
-|  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
-|  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
-|  | Coleoptera | *Colaphellus* | *C. bowringi* | @tang2017 |
-|  | Odonata | 7 genera | 14 species | Developmental equations in @pritchard1987 |
-|  | Culicidae | *Aedes* | *A. sticticus, A. vexans* |  |
-|  |  | *Anopheles* | *A. quadrimaculatus* |  |
-|  |  | *Toxorhynchites* | *T. brevipalpis* |  |
-| Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
+| Asteroidea | Valvatida | *Acanthaster* | *A. planci* | @hoegh-guldberg1995 |
+|  |  | *Asterina* | *A. miniata* |  |
+|  |  | *Odontaster* | *O. meridionalis, O. validus* |  |
+| Cephalopoda | Myopsida | *Loligo* | *L. reynaudii, L. vulgaris* | @márquez2021 |
+|  | Octopoda | *Octopus* | *O. mimus, O. vulgaris* |  |
+|  | Oegopsida | *Illex* | *I. coindetii, I. illecebrosus* |  |
+|  |  | *Ommastrephes* | *O. bartramii* |  |
+|  |  | *Todarodes* | *T. pacificus* |  |
 | Copepoda | Calanoida | 10 genera | 28 species | @forster2011 |
 |  | Cyclopoida | *Limnoithona* | *L. tetraspina* |  |
 |  |  | *Oithona* | *O. davisae* |  |
-|  | Harpacticoida | *Microsetella* | *M. norvegica* |  |
-|  |  | *Mesochra* | *M.lilljeborgi* |  |
+|  | Harpacticoida | *Mesochra* | *M. lilljeborgi* |  |
+|  |  | *Microsetella* | *M. norvegica* |  |
 |  | Poecilostomatoida | *Oncaea* | *O. venusta* |  |
-| Cephalopoda | Octopoda | *Octopus* | *O. vulgaris, O. mimus* | @márquez2021 |
-|  | Myopsida | *Loligo* | *L. vulgaris, L. reynaudii* |  |
-|  | Oegopsida | *Illex* | *I. coindetii, I. illecebrosus* |  |
-|  |  | *Todarodes* | *T.pacificus* |  |
-|  |  | *Ommastrephes* | *O. bartramii* |  |
-| Asteroidea | Valvatida | *Odontaster* | *O. meridionalis, O. validus* | @hoegh-guldberg1995 |
-|  |  | *Asterina* | *A. miniata* |  |
-|  |  | *Acanthaster* | *A. planci* |  |
+| Insecta | Coleoptera | *Colaphellus* | *C. bowringi* | @tang2017 |
+|  | Culicidae | *Aedes* | *A. sticticus, A. vexans* | Developmental equations in @pritchard1987 |
+|  |  | *Anopheles* | *A. quadrimaculatus* |  |
+|  |  | *Toxorhynchites* | *T. brevipalpis* |  |
+|  | Odonata | 7 genera | 14 species |  |
+|  | Plecoptera | *Capnia* | *C. atra* | @brittain1984 |
+|  |  | *Capnia* | *C. bifrons* | @elliott1986 |
+|  |  | *Mesocapnia* | *M. oenone* | @brittain1984 |
+|  |  | *Nemurella* | *N. pictetii* | @brittain1978, @elliott1984 |
+|  |  | *Taeniopteryx* | *T. nebulosa* | @brittain1977 |
+| Malacostraca | Decapoda | *Pontastacus* | *P. leptodactylus* | @aydin2004 |
+| Reptilia | Squamata | *Podarcis* | *P. muralis* | @vandamme1992 |
+|  |  | *Sceloporus* | *S. undulatus* | @angilletta2000 |
+|  | Testudines | *Mauremys* | *M. reevesii* | @du2007 |
+|  |  |  | 181 species | 141 studies in @while2018 |
 
 : Putative sources for effective value parameterization using `fit_model()` in **hatchR** for a broad array of taxa**.** @while2018 and @pritchard1987 are broader reviews with multiple species and are flagged as not yet vetted for full reciprocal model implementation. Users may need to extract or adapt published equations to align with the effective value framework.
 
@@ -818,9 +820,9 @@ The authors declare no known conflicts of interest.
 
 # Figure Captions
 
-Figure 1: Custom hatching phenology model for coastal tailed frogs (*Ascaphus truei*). Panel A represents the model fit and raw data used to generate the effective value model and panel B are the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase in included for reference.
+Figure 1: Custom hatching phenology model for coastal tailed frogs (*Ascaphus truei*). Panel A represents the model fit and raw data used to generate the effective value model and panel B illustrates the effective values for daily temperatures between 6 and 20 °C. A dashed line with a 0.01 increase for every degree increase is included for reference.
 
-Figure 2: Modeled changes in developmental timing for coastal tailed frogs (*Ascaphus truei*) from 1991 to 2020. Panel A: Marginal mean trend across all sites showing a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals.
+Figure 2: Modeled changes in developmental timing for coastal tailed frogs (*Ascaphus truei*) from 1991 to 2020. Panel A: Marginal mean trend across all sites shows a significant decline in days to hatching over time. Panel B: Site-specific (COMID) trends in predicted days to hatch, colored by mountain range. Estimates are based on the best fitting model, with stream temperatures from @siegel2023 and developmental timing modeled using hatchR. Shaded ribbons represent 95% confidence intervals.
 
 Figure 3: Custom hatch timing models developed for four North American *Lithobates* frog species. Models are parameterized from @moore1939 and phenology is predicted using two synthetic temperature regimes: Panel A shows predictions under a cooler regime (mean = 16 °C), while Panel B shows predictions under a warmer regime (mean = 24 °C). Panel C displays the effective value curves for each species—linearized thermal reaction norms. The crossover in rank order between Panels A and B illustrates genotype-by-environment interactions, reflecting species-specific thermal niches and breeding strategies.
 
