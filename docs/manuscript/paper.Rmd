@@ -780,7 +780,7 @@ The authors declare no known conflicts of interest.
 # Tables
 
 | Class | Order | Genus | Species | Study |
-|:--------------|:--------------|:--------------|:--------------|:--------------|
+|:---|:---|:---|:---|:---|
 | Amphibia | Anura | *Ascaphus* | *A. truei* | @brown1975 |
 |  |  | *Lithobates* | *L. clamitans, L. palustris, L. pipiens, L. sylvaticus* | @moore1939 |
 |  | Urodela | *Ambystoma* | *A. gracile* | @brown1976 |
