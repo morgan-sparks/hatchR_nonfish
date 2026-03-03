@@ -578,7 +578,7 @@ p2.1.a <- ggplot() +
   theme(legend.position = "none")
 
 # run for temp 24 C
-set.seed(123)
+set.seed(321)
 temperature_data_warm <- data.frame(
   temperatures = sort(rnorm(30, mean = 24, sd = 2.5)),
   dates = seq(ymd("2000-04-01"), ymd("2000-04-30"), by = "days")
@@ -837,7 +837,7 @@ Figure 3: Custom hatch timing models developed for four North American *Lithobat
 Figure 4: Effective value models for five populations of cabbage beetles (*Colaphellus bowringi*, females) along a latitudinal gradient in China [@tang2017]. Models were parameterized from common garden experiments under constant temperatures. The southernmost population (Xiushui County) shows a consistently faster developmental rate than populations from more northerly sites, especially at warmer temperatures. This pattern is indicative of cogradient variation, where both genetic and environmental effects reinforce the observed phenotypic trend.
 
 \newpage
-
+<!---
 # Figures
 
 ```{r fig-1,  fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
@@ -861,3 +861,4 @@ fig3
 ```{r fig-4, fig.width=8, fig.height=4, fig.align='center', fig.cap=""}
 fig4
 ```
+--->
