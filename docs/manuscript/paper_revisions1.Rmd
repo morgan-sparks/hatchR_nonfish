@@ -16,13 +16,15 @@ bibliography: references.bib
 
 # A generalizable tool for predicting developmental phenology for wild ecotherms
 
-Morgan M. Sparks^1,3^, Brian C. Leavell^2^, Bryan M. Maitland^1^
+Morgan M. Sparks^1,4^, Brian C. Leavell^2,3^, Bryan M. Maitland^1^
 
 ^1^Rocky Mountain Research Station, U.S. Forest Service, Boise, Idaho, USA
 
 ^2^Smithsonian Tropical Research Institute, Balboa, Ancón, Panamá
 
-^3^Corresponding author, [Morgan.Sparks\@usda.gov](mailto:Morgan.Sparks@usda.gov){.email}
+^3^Department of Biological Sciences, Purdue University, West Lafayette, IN, USA
+
+^4^Corresponding author, [Morgan.Sparks\@usda.gov](mailto:Morgan.Sparks@usda.gov){.email}
 
 Type: Research Article
 
