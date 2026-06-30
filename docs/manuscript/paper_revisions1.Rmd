@@ -917,7 +917,7 @@ Given the wide potential applicability of **hatchR**, we especially emphasize it
 
 # Acknowledgements
 
-We thank N. Karraker, D. Pilliod, M. Hayes, R.B. Bury, and B. Norman for their help in translating sites for the tailed frog example to locations that could be aligned with COMIDs. D. Horan helped organize GPS locations into COMIDs. The views expressed in this manuscript are those of the authors and do not necessarily represent the views or policies of USFS. Any mention of trade names, products, or services does not imply an endorsement by the U.S. government or USFS. USFS does not endorse any commercial products, services or enterprises.
+We thank N. Karraker, D. Pilliod, M. Hayes, R.B. Bury, and B. Norman for their help in translating sites for the tailed frog example to locations that could be aligned with COMIDs. D. Horan helped organize GPS locations into COMIDs. The authors have no funding to report. The views expressed in this manuscript are those of the authors and do not necessarily represent the views or policies of USFS. Any mention of trade names, products, or services does not imply an endorsement by the U.S. government or USFS. USFS does not endorse any commercial products, services or enterprises.
 
 # Author Contributions
 
