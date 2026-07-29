@@ -8,3 +8,5 @@ hatchR is a software ecosystem that allows users to parameterize developmental p
 hatchR can be downloaded from CRAN using `install.packages("hatchR")`. It is also available as a point and click Shiny app. Information about the package, Shiny app, and numerous examples of how to use the software are available at the package website (<https://bmait101.github.io/hatchR/index.html>).
 
 **Updated:** 07-29-2026 for acceptance to *Ecology and Evolution* and archival at Zenodo
+[![DOI](https://zenodo.org/badge/989096875.svg)](https://doi.org/10.5281/zenodo.21682681)
+
